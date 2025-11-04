@@ -53,6 +53,21 @@ $user = $_SESSION['user_data'];
       margin-right: 20px;
       font-size: 24px;
     }
+     /* 1. ทำให้ "หน้าแรก" (ที่เป็นลิงก์ <a>) เป็นสีเทา */
+        .breadcrumb-item a {
+            color: #6c757d;
+            text-decoration: none;
+        }
+
+        /* 2. ทำให้ลิงก์ "หน้าแรก" เปลี่ยนเป็นสีน้ำเงินเมื่อชี้ */
+        .breadcrumb-item a:hover {
+            color: #0d6efd;
+        }
+
+        /* 3. ทำให้หน้าปัจจุบัน (active) เป็นสีเข้ม */
+        .breadcrumb-item.active {
+            color: #2689ebff;
+        }
     </style>
 </head>
 
@@ -76,10 +91,17 @@ $user = $_SESSION['user_data'];
     <div class="container my-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-
+            <nav aria-label="breadcrumb" class="mb-2">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.php" class="text-decoration-none"><i class="fas fa-home me-1"></i> หน้าแรก</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            3.OR
+                        </li>
+                    </ol>
+                </nav>
 
                 <div class="card shadow-sm">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header navbar-custom text-white">
                         <h4 class="mb-0">📝 ฟอร์มบันทึกการผ่าตัด/หัตถการ (OR Procedure Form)</h4>
                     </div>
                     <div class="card-body p-4">
@@ -224,9 +246,9 @@ $user = $_SESSION['user_data'];
                                 </Fie>
 
                                 <hr class="my-4">
-                                <div class="d-grid">
+                                <!-- <div class="d-grid">
                                     <button type="submit" class="btn btn-success btn-lg">✔️ บันทึกและส่งต่อหอผู้ป่วย (Save & Send to Ward)</button>
-                                </div>
+                                </div> -->
 
                         </form>
                     </div>

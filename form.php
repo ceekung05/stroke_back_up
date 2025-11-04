@@ -81,10 +81,11 @@ $user = $_SESSION['user_data'];
                         </li>
                     </ol>
                 </nav>
-
-                <h2 class="mb-4">ฟอร์มบันทึกข้อมูลแรกรับ (Admission Form)</h2>
-
+                
                 <div class="card shadow-sm mb-4">
+                    <div class="card-header navbar-custom text-white">
+                <h2 class="mb-0">ฟอร์มบันทึกข้อมูลแรกรับ (Admission Form)</h2>
+                </div>
                     <div class="card-header bg-white">
                         <h5 class="mb-0">1. ค้นหาผู้ป่วย</h5>
                     </div>
@@ -287,7 +288,7 @@ $user = $_SESSION['user_data'];
                                     </div>
                                 </div>
                         </div>
-                        <div class="text-center mt-5">
+                        <div class="text-center mt-2 mb-5">
                             <button type="submit" class="btn btn-primary btn-lg px-5">
                                 <i class="fas fa-save me-2"></i> บันทึกข้อมูล
                             </button>

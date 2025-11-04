@@ -1,7 +1,7 @@
 <?php
 // 1. [ต้องมี] เริ่ม session เพื่อ "ปลุก" ข้อมูลที่เก็บไว้
-session_start(); 
-$user = $_SESSION['user_data']; 
+session_start();
+$user = $_SESSION['user_data'];
 
 ?>
 <!doctype html>
@@ -54,6 +54,22 @@ $user = $_SESSION['user_data'];
       margin-right: 20px;
       font-size: 24px;
     }
+
+    /* 1. ทำให้ "หน้าแรก" (ที่เป็นลิงก์ <a>) เป็นสีเทา */
+    .breadcrumb-item a {
+      color: #6c757d;
+      text-decoration: none;
+    }
+
+    /* 2. ทำให้ลิงก์ "หน้าแรก" เปลี่ยนเป็นสีน้ำเงินเมื่อชี้ */
+    .breadcrumb-item a:hover {
+      color: #0d6efd;
+    }
+
+    /* 3. ทำให้หน้าปัจจุบัน (active) เป็นสีเข้ม */
+    .breadcrumb-item.active {
+      color: #2689ebff;
+    }
   </style>
 </head>
 
@@ -74,18 +90,27 @@ $user = $_SESSION['user_data'];
       </div>
     </div>
   </nav>
+
   <div class="container my-5">
     <div class="row justify-content-center">
       <div class="col-lg-10">
-        <div class="card shadow-sm">
-          <div class="card-header bg-secondary text-white">
-            <h4 class="mb-0">🖥️ หน้าจอหอผู้ป่วย (Ward Monitoring)</h4>
-          </div>
-          <div class="card-body p-4">
-            
-            <fieldset class="border p-3 rounded mb-4">
-              <legend class="float-none w-auto px-2 h5">1. การเฝ้าระวัง (Monitoring)</legend>
-              <div class="mb-3">
+        <div class="card-body p-4">
+          <nav aria-label="breadcrumb" class="mb-2">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="index.php" class="text-decoration-none"><i class="fas fa-home me-1"></i> หน้าแรก</a></li>
+              <li class="breadcrumb-item active" aria-current="page">
+                4.ward
+              </li>
+            </ol>
+          </nav>
+          <div class="card shadow-sm">
+            <div class="card-header navbar-custom text-white">
+              <h4 class="mb-0">🖥️ หน้าจอหอผู้ป่วย (Ward Monitoring)</h4>
+            </div>
+
+            <fieldset class="border p-3 py-1 rounded mb-3">
+              <legend class="float-none w-auto px-2 py-3 h5">1. การเฝ้าระวัง (Monitoring)</legend>
+              <div class="mb-1">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEntryModal">
                   ➕ เพิ่มบันทึกการเฝ้าระวัง
                 </button>
@@ -116,7 +141,7 @@ $user = $_SESSION['user_data'];
                 <label for="ctFirstDay" class="form-label">CT วันแรก (ผล)</label>
                 <input type="text" class="form-control" id="ctFirstDay" placeholder="บันทึกผล CT วันแรก...">
               </div>
-              
+
               <div class="mb-3">
                 <label class="form-label fw-bold">สถานะการผ่าตัดกะโหลก:</label>
                 <div class="form-check">
@@ -132,14 +157,16 @@ $user = $_SESSION['user_data'];
                   </label>
                 </div>
               </div>
-              </fieldset>
+            </fieldset>
 
             <fieldset class="border p-3 rounded">
               <legend class="float-none w-auto px-2 h5">3. การประเมินเพื่อจำหน่าย</legend>
               <div class="row g-3">
                 <div class="col-md-4">
                   <label for="mrsDischarge" class="form-label">mRS (ณ วันจำหน่าย)</label>
-                  <select class="form-select" id="mrsDischarge"><option value="0">0</option></select>
+                  <select class="form-select" id="mrsDischarge">
+                    <option value="0">0</option>
+                  </select>
                 </div>
                 <div class="col-md-4">
                   <label for="barthel" class="form-label">Barthel Index</label>
