@@ -67,7 +67,7 @@ header("Expires: 0");
 <body>
     <div class="container col-md-4 ">
         <div class="row justify-content-center ">
-                <div class="card shadow-sm border-0 bg-info-subtle text-info-emphasis ">
+                <div class="card shadow-sm border-0  text-primary-info-emphasis" style='background-color: #4a559d;'>
                     <div class="card-body p-4 p-md-5 ">
 
                         <h1 class="text-center mb-4">Login</h1>

@@ -16,6 +16,7 @@ $user = $_SESSION['user_data'];
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -72,14 +73,15 @@ $user = $_SESSION['user_data'];
         </div>
 
         <div class="section-title">
-            <i class="bi bi-box-arrow-right"></i> 1. แผนการจำหน่าย
+            <i class="bi bi-box-arrow-right"></i> 1. หลังจำหน่ายจากรพ.
         </div>
         <div class="row g-3">
-            <div class="col-md-6 mb-3">
-                <label for="dischargeDate" class="form-label fw-bold">วันที่จำหน่าย (Discharge Date)</label>
-                <input type="date" class="form-control" id="dischargeDate">
+            <div class="col-md-3 mb-3">
+                <label for="dischargeDate" class="form-label fw-bold">วันที่นัดครั้งแรก</label>
+                <input type="date" class="form-control " id="dischargeDate" >
+                <!-- <input type="time" name="" id="" class="form-control mt-2"> -->
             </div>
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
                 <label for="dischargePlan" class="form-label">แผนการจำหน่าย (กลับบ้าน or refer)</label>
                 <select class="form-select" id="dischargePlan">
                     <option value="home">กลับบ้าน (Go Home)</option>
@@ -92,7 +94,7 @@ $user = $_SESSION['user_data'];
             <i class="bi bi-calendar-event"></i> 2. ระบบนัดหมายติดตามผล
         </div>
         <div class="row g-3">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-3 mb-3">
                 <label for="mrsAtDischarge" class="form-label"><strong>mRS (ณ วันจำหน่าย) (mRS 0):</strong></label>
                 <select class="form-select" id="mrsAtDischarge">
                     <option value="">-- เลือก mRS ณ วันจำหน่าย --</option>
@@ -105,7 +107,7 @@ $user = $_SESSION['user_data'];
                     <option value="6">6 - Dead</option>
                 </select>
             </div>
-            <div class="col-md-6 mb-3 d-flex align-items-end">
+            <div class="col-md-6 mb-4 d-flex align-items-end">
                 <button type="button" class="btn btn-outline-primary" id="autoCreateAppointments">
                     <i class="bi bi-plus-circle"></i> สร้างนัดอัตโนมัติ (mRS 1, 3, 6, 12)
                 </button>
@@ -123,10 +125,11 @@ $user = $_SESSION['user_data'];
                 </tr>
             </thead>
             <tbody id="followupTableBody">
-            </tbody>
+                </tbody>
         </table>
 
     </div>
+
     <div class="modal fade" id="editMrsModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -155,10 +158,20 @@ $user = $_SESSION['user_data'];
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/th.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/plugins/buddhistYear.js"></script>
+    <script>
+        flatpickr(".datepicker-no-time", {
+            dateFormat: "d/m/Y",
+            locale: "th",
+            plugins: [new window.flatpickr.plugins.buddhistYear()],
+            monthSelectorType: "dropdown"
+        });
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ... (JS สำหรับสร้างนัดหมายและบันทึก mRS เหมือนเดิม) ...
             const createButton = document.getElementById('autoCreateAppointments');
             const dischargeDateInput = document.getElementById('dischargeDate');
             const tableBody = document.getElementById('followupTableBody');
@@ -170,7 +183,7 @@ $user = $_SESSION['user_data'];
             createButton.addEventListener('click', function() {
                 const startDate = dischargeDateInput.value;
                 if (!startDate) {
-                    alert('กรุณาเลือก "วันที่จำหน่าย" ก่อนครับ');
+                    alert('กรุณาเลือก "วันที่นัดครั้งแรก" ก่อนครับ');
                     return;
                 }
                 tableBody.innerHTML = '';
@@ -187,44 +200,87 @@ $user = $_SESSION['user_data'];
                     });
                     const label = `mRS ${months} เดือน`;
 
+                    // (*** แก้ไขปุ่ม Action ตรงนี้ ***)
                     tableBody.innerHTML += `
                         <tr>
                           <td data-label="${label}"><strong>${label}</strong></td>
                           <td>${formattedDate}</td>
                           <td><span class="badge bg-warning">รอนัด</span></td>
                           <td class="mrs-score-cell text-muted">(ว่าง)</td>
-                          <td>
+                          <td class="action-cell">
                             <button type="button" class="btn btn-primary btn-sm edit-mrs-btn" data-bs-toggle="modal" data-bs-target="#editMrsModal">
                               <i class="bi bi-pencil-fill"></i> บันทึก
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-sm no-show-btn ms-1">
+                              <i class="bi bi-x-circle"></i> (ไม่มา)
                             </button>
                           </td>
                         </tr>`;
                 });
             });
 
+            // (*** อัปเดต Event Listener ให้รองรับปุ่ม "ไม่มา" ***)
             tableBody.addEventListener('click', function(event) {
+                // 1. จัดการปุ่ม "บันทึก" (เปิด Modal)
                 const targetButton = event.target.closest('.edit-mrs-btn');
                 if (targetButton) {
                     currentRowToUpdate = targetButton.closest('tr');
                     const label = currentRowToUpdate.querySelector('td[data-label]').innerText;
                     modalElement.querySelector('.modal-title').innerText = `บันทึกคะแนน: ${label}`;
-                    document.getElementById('mrsScoreSelect').value = "0";
+                    document.getElementById('mrsScoreSelect').value = "0"; // ตั้งค่าเริ่มต้น
+                }
+
+                // 2. (*** ใหม่: จัดการปุ่ม "ไม่มา" ***)
+                const noShowButton = event.target.closest('.no-show-btn');
+                if (noShowButton) {
+                    // ถามยืนยัน
+                    if (confirm('ยืนยันว่าผู้ป่วย "ไม่มา" ตามนัดนี้?')) {
+                        const row = noShowButton.closest('tr');
+                        const statusCell = row.querySelector('td span.badge');
+                        
+                        // เปลี่ยนสถานะเป็น "ไม่มา" (สีแดง)
+                        statusCell.innerText = 'ไม่มา';
+                        statusCell.classList.remove('bg-warning');
+                        statusCell.classList.add('bg-danger');
+
+                        // ปิดปุ่มทั้งหมดในแถว
+                        const actionCell = row.querySelector('.action-cell');
+                        actionCell.querySelectorAll('button').forEach(btn => {
+                            btn.disabled = true;
+                        });
+                        
+                        // ล้างค่า mRS
+                        row.querySelector('.mrs-score-cell').innerText = '(N/A)';
+                    }
                 }
             });
 
+            // (*** อัปเดตการบันทึก Modal ***)
             saveMrsButton.addEventListener('click', function() {
                 if (!currentRowToUpdate) return;
                 const selectElement = document.getElementById('mrsScoreSelect');
                 const selectedScoreText = selectElement.options[selectElement.selectedIndex].text;
 
+                // บันทึก mRS
                 currentRowToUpdate.querySelector('.mrs-score-cell').innerText = selectedScoreText;
                 currentRowToUpdate.querySelector('.mrs-score-cell').classList.remove('text-muted');
+                
                 const statusCell = currentRowToUpdate.querySelector('td span.badge');
-                statusCell.innerText = 'เสร็จสิ้น';
+                
+                // (*** เปลี่ยนสถานะเป็น "มา" (สีเขียว) ***)
+                statusCell.innerText = 'มา';
                 statusCell.classList.remove('bg-warning');
                 statusCell.classList.add('bg-success');
+                
                 const editButton = currentRowToUpdate.querySelector('.edit-mrs-btn');
-                editButton.disabled = true;
+                
+                // ปิดปุ่มทั้งหมดในแถว
+                const actionCell = currentRowToUpdate.querySelector('.action-cell');
+                actionCell.querySelectorAll('button').forEach(btn => {
+                    btn.disabled = true;
+                });
+                
+                // อัปเดตปุ่ม "บันทึก" (เพื่อความสวยงาม)
                 editButton.innerHTML = '<i class="bi bi-check-lg"></i> บันทึกแล้ว';
                 editButton.classList.remove('btn-primary');
                 editButton.classList.add('btn-secondary');

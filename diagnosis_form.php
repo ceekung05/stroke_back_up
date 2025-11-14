@@ -13,13 +13,12 @@ $user = $_SESSION['user_data'];
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>2. ER - ระบบ Stroke Care</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -31,12 +30,10 @@ $user = $_SESSION['user_data'];
             <i class="bi bi-heart-pulse-fill"></i>
             <span>Stroke Care</span>
         </div>
-
         <a href="index.php">
             <i class="bi bi-list-task"></i> กลับไปหน้า Patient List
         </a>
         <hr class="sidebar-divider">
-
         <a href="form.php">
             <i class="bi bi-person-lines-fill"></i> 1. ข้อมูลทั่วไป
         </a>
@@ -52,7 +49,6 @@ $user = $_SESSION['user_data'];
         <a href="follow.php">
             <i class="bi bi-calendar-check"></i> 5. Follow Up
         </a>
-
         <hr class="sidebar-divider">
         <a href="logout.php" class="text-danger">
             <i class="bi bi-box-arrow-right"></i> ออกจากระบบ
@@ -73,48 +69,143 @@ $user = $_SESSION['user_data'];
 
         <form>
             <div class="section-title">
-                <i class="bi bi-activity"></i> 1. การตัดสินใจรักษา
+                <i class="bi bi-activity"></i> 1. เวลาในการส่งต่อ
             </div>
-            <label class="form-label">การตัดสินใจให้ยาละลายลิ่มเลือด (t-PA / TNK)</label>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="giveTpa">
-                <label class="form-check-label" for="giveTpa">
-                    ให้การรักษา (Give t-PA/TNK)
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="notGiveTpa">
-                <label class="form-check-label" for="notGiveTpa">
-                    ให้การรักษาไม่ได้ (Not-Give t-PA/TNK)
-                </label>
-            </div>
-            <h5 class="mt-4">⏱️ refer time</h5>
+
             <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="onsetTime" class="form-label">เวลาที่รถออกจากต้นทาง </label>
-                    <input type="time" class="form-control" id="onsetTime">
+
+                <div class="col-md-2">
+                    <label for="arrivalTime" class="form-label fw-bold mt-2">วันที่ส่งต่อ</label>
+                    <input type="date" class="form-control " id="arrivalTime" name="arrivalTime" >
                 </div>
-                <div class="col-md-6">
-                    <label for="arrivalTime" class="form-label">เวลาที่ถึง รพ.</label>
-                    <input type="time" class="form-control" id="arrivalTime">
+                <div class="col-md-2">
+                    <label for="arrivalTime" class="form-label mt-2">เวลาที่รถออก</label>
+                    <input type="time" class="form-control" id="arrivalTime_time" name="arrivalTime_time">
+                </div>
+                <div class="col-md-2">
+                    <label for="arrivalTime_datetime" class="form-label mt-2">วันที่ถึง รพ. ปลายทาง</label>
+                    <input type="date" class="form-control " id="arrivalTime_datetime" name="arrivalTime_datetime" >
+                </div>
+                <div class="col-md-2">
+                    <label for="arrivalTime_time_destination" class="form-label mt-2">เวลาถึง รพ. ปลายทาง</label>
+                    <input type="time" class="form-control" id="arrivalTime_time_destination" name="arrivalTime_time_destination">
+                </div>
+            </div>
+            <hr>
+            <div class="section-title">
+                2.การส่งปรึกษาแพทย์เฉพาะทางของประสาทวิทยา
+            </div>
+            <div class="row">
+                <div class="mb-3 col-md-2">
+                    <label for="consult_neuro_date" class="form-label">วันที่ที่ส่งปรึกษา</label>
+                    <input type="date" id="consult_neuro_date" class="form-control mt-2 " >
+                </div>
+                <div class="mb-3 col-md-2">
+                    <label for="consult_neuro_time_input" class="form-label">เวลาที่ส่งปรึกษา</label>
+                    <input type="time" id="consult_neuro_time_input" class="form-control mt-2">
                 </div>
             </div>
 
+
             <div class="section-title">
-                <i class="bi bi-intersect"></i> 2. การวินิจฉัย และ Imaging
+                <i class="bi bi-intersect"></i> 3. การวินิจฉัย และ Imaging
+            </div>
+            <div class="row ">
+                <div class="col-md-2">
+                    <label for="ctncDate" class="form-label">CT non contact</label>
+                    <input type="date" class="form-control " id="ctncDate">
+                </div>
+                <div class="col-md-2 mt-auto">
+                    <input type="time" class="form-control " id="ctncTime_input">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="ctaTime" class="form-label">CTA</label>
+                    <input type="date" class="form-control " id="ctaTime">
+                </div>
+                <div class="col-md-2 mt-auto">
+                    <input type="time" class="form-control " id="ctaTime_input">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="mriTime" class="form-label">MRI</label>
+                    <input type="date" class="form-control " id="mriTime">
+                </div>
+                <div class="col-md-2 mt-auto">
+                    <input type="time" class="form-control " id="mriTime_input">
+                </div>
+            </div>
+            <div class="section-title">
+                <i class="bi bi-intersect"></i> 4. การปรึกษาแพทย์
+            </div>
+            <div class="row">
+                <div class=" col-md-2">
+                    <label for="consult_intervention_time" class="form-label">Neuro-Interventionist</label>
+                    <input type="date" id="consult_intervention_time" class="form-control mt-2 " placeholder="วัน/เดือน/ปี">
+                </div>
+                <div class="col-md-2 mt-auto">
+                    <input type="time" class="form-control " id="consult_intervention_time_input">
+                </div>
+            </div>
+
+
+            <div class="section-title">
+                5. ผล CT/CTA
             </div>
             <div class="row g-3">
-                <div class="col-md-4">
-                    <label for="ctncTime" class="form-label">CT NC กี่โมง</label>
-                    <input type="time" class="form-control" id="ctncTime">
+                <div class="col-md-2">
+                    <label for="aspect" class="form-label">ASPECT (0-10)</label>
+                    <select class="form-select" id="aspect">
+                        <option selected disabled>--select--</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
                 </div>
-                <div class="col-md-4">
-                    <label for="ctaTime" class="form-label">CTA กี่โมง</label>
-                    <input type="time" class="form-control" id="ctaTime">
+                <div class="col-md-2">
+                    <label for="collateral" class="form-label">Collateral score (0-5)</label>
+                    <select class="form-select " id="collateral">
+                        <option selected disabled>--select--</option>
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
                 </div>
-                <div class="col-md-4">
-                    <label for="mriTime" class="form-label">MRI กี่โมง</label>
-                    <input type="time" class="form-control" id="mriTime">
+                <div class="col-md-2">
+                    <label for="occlusionLocation" class="form-label">Occlusion site (Drop down)</label>
+                    <select class="form-select" id="occlusionLocation">
+                        <option selected>-- เลือกตำแหน่ง --</option>
+                        <option value="Left ICA">Cervical ICA left</option>
+                        <option value="Right ICA">Cervical ICA Right</option>
+                        <option value="Intracranial left ICA">Intracranial ICA left</option>
+                        <option value="Intracranial Right ICA">Intracranial ICA Right</option>
+                        <option value="Left M1 of MCA">Left M1 of MCA</option>
+                        <option value="Right M1 of MCA">Right M1 of MCA</option>
+                        <option value="Left M2 of MCA">Left M2 of MCA</option>
+                        <option value="Right M2 of MCA">Right M2 of MCA</option>
+                        <option value="Right Beyond M2 of MCA">Left Beyond M2 of MCA</option>
+                        <option value="Right Beyond M2 of MCA">Right Beyond M2 of MCA</option>
+                        <option value="Left ACA">Left ACA</option>
+                        <option value="Right ACA">Right ACA</option>
+                        <option value="Left PCA">Left PCA</option>
+                        <option value="Right PCA">Right PCA</option>
+                        <option value="left Vertebral artery">left Vertebral artery </option>
+                        <option value="Right Vertebral artery">Right Vertebral artery</option>
+                        <option value="Basilar">Basilar </option>
+                    </select>
                 </div>
             </div>
             <hr>
@@ -122,75 +213,60 @@ $user = $_SESSION['user_data'];
             <div class="p-3 bg-light border rounded">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="ctResult" id="ctResultIschemic" value="ischemic">
-                    <label class="form-check-label fs-5" for="ctResultIschemic">ไม่พบเลือดออก (Ischemic)</label>
+                    <label class="form-check-label fs-5" for="ctResultIschemic">Ischemic</label>
                 </div>
                 <hr class="my-2">
                 <div class="form-check">
                     <input class="form-check-input" type="radio" name="ctResult" id="ctResultHemorrhagic" value="hemorrhagic">
-                    <label class="form-check-label fs-5" for="ctResultHemorrhagic">พบเลือดออก (Hemorrhagic)</label>
+                    <label class="form-check-label fs-5" for="ctResultHemorrhagic">Hemorrhagic</label>
                 </div>
             </div>
 
             <div class="section-title">
-                <i class="bi bi-signpost-split"></i> 3. แนวทางการรักษา (Treatment Pathway)
+                <i class="bi bi-signpost-split"></i>การรักษา (Treatment Pathway)
             </div>
 
             <div id="ischemicPathway" class="d-none">
-                <h4 class="text-primary">A. แนวทาง Ischemic Stroke</h4>
+                <h4 class="text-primary">A. การรักษา Ischemic Stroke</h4>
                 <div class="card card-body shadow-sm">
-                    <label class="form-label fw-bold">1. การให้ยาละลายลิ่มเลือด (IV Lysis)</label>
+                    <label class="form-label fw-bold">1. Fibrinolytic</label>
+
                     <div class="row g-3 mb-3">
-                        <div class="col-md-6">
-                            <label for="tpaTime" class="form-label">rT-PA / TNK กี่โมง</label>
-                            <input type="time" class="form-control" id="tpaTime">
-                        </div>
-                        <div class="col-md-6 d-flex align-items-end">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="noTpa">
-                                <label class="form-check-label" for="noTpa">ไม่ให้การรักษา (Contraindicated)</label>
+                        <div class="col-md-12">
+                            <div class="d-flex flex-wrap gap-2">
+                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_rtpa" value="rtpa" autocomplete="off">
+                                <label class="btn btn-outline-secondary" for="fib_rtpa">rt-PA</label>
+
+                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_sk" value="sk" autocomplete="off">
+                                <label class="btn btn-outline-secondary" for="fib_sk">SK</label>
+
+                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_tnk" value="tnk" autocomplete="off">
+                                <label class="btn btn-outline-secondary" for="fib_tnk">TNK</label>
+
+                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_no" value="no" autocomplete="off">
+                                <label class="btn btn-outline-secondary" for="fib_no">NO</label>
                             </div>
                         </div>
-                    </div>
-                    <hr>
-                    <label class="form-label fw-bold">2. การสวนลากลิ่มเลือด (Mechanical Thrombectomy - MT)</label>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="anesthesiaTime" class="form-label">ดมยา กี่โมง</label>
-                            <input type="time" class="form-control" id="anesthesiaTime">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="punctureTime" class="form-label">puncture กี่โมง</label>
-                            <input type="time" class="form-control" id="punctureTime">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="recanTime" class="form-label">Recanalization กี่โมง</label>
-                            <input type="time" class="form-control" id="recanTime">
+                        <div class="col-md-3">
+                            <label for="tpaTime" class="form-label">เวลาที่เริ่มให้ยา</label>
+                            <input type="time" class="form-control" id="tpaTime">
                         </div>
                     </div>
                     <hr>
-
-                    <label class="form-label fw-bold">3. ข้อมูลจาก CT / CTA</label>
+                    <label class="form-label fw-bold">2.การเตรียมทำหัตถการ</label>
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <label for="aspect" class="form-label">ASPECT (0-10)</label>
-                            <input type="number" class="form-control" id="aspect" min="0" max="10">
+                        <div class="col-md-3">
+                            <label for="anesthesiaTime" class="form-label">Set ดมยา</label>
+                            <input type="date" class="form-control " id="anesthesiaTime" >
+                            <input type="time" name="" id="" class="form-control mt-2">
                         </div>
-                        <div class="col-md-4">
-                            <label for="collateral" class="form-label">Collateral score (0-5)</label>
-                            <input type="number" class="form-control" id="collateral" min="0" max="5">
-                        </div>
-                        <div class="col-md-4">
-                            <label for="occlusionLocation" class="form-label">ตันตรงไหน (Drop down)</label>
-                            <select class="form-select" id="occlusionLocation">
-                                <option selected>-- เลือกตำแหน่ง --</option>
-                                <option value="ICA">ICA</option>
-                                <option value="M1">M1</option>
-                                <option value="M2">M2</option>
-                                <option value="Basilar">Basilar</option>
-                                <option value="Other">Other...</option>
-                            </select>
+                        <div class="col-md-3">
+                            <label for="punctureTime" class="form-label">Activate Team</label>
+                            <input type="date" class="form-control " id="punctureTime" >
+                            <input type="time" name="" id="" class="form-control mt-2">
                         </div>
                     </div>
+                    <hr>
                 </div>
             </div>
 
@@ -203,11 +279,9 @@ $user = $_SESSION['user_data'];
                     </div>
                 </div>
             </div>
-
         </form>
 
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
