@@ -119,7 +119,7 @@ body {
   font-size: 2.5rem;
   color: var(--color-primary);
   margin-right: 1.5rem;
-  background-color: #fff8f0; /* (*** เปลี่ยนสีพื้นหลังไอคอน ***) */
+  background-color: #fff8f0; /*(*** เปลี่ยนสีพื้นหลังไอคอน ***) */
   border-radius: 10px;
   width: 70px;
   height: 70px;
