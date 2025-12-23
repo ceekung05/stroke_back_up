@@ -1,291 +1,274 @@
 /*
  * ========================================
- * Pastel Minimal Theme (Stroke Care)
+ * Stroke Care Professional Theme
+ * Concept: Brain (Navy) & Emergency (Red)
  * ========================================
  */
 
-/* --- 1. การตั้งค่าตัวแปรสีและฟอนต์ (Theme) --- */
+/* --- 1. การตั้งค่าตัวแปรสี (Color Palette) --- */
 :root {
- --color-primary: #b19cd9; /* สีหลัก (ม่วงพาสเทล) */
-  --color-primary-hover: #c4b0e0; /* สีหลัก (เมื่อวางเมาส์) */
-  --color-success: #63c4a9;
-  --color-warning: #f1c58c;
-  --color-danger: #e68b8b;
+  --primary-color: #1a237e;      /* สีน้ำเงินเข้ม (Deep Navy) - ตัวแทนระบบประสาท */
+  --primary-light: #534bae;      /* สีน้ำเงินสว่าง */
+  --secondary-color: #263238;    /* สีเทาเข้มเกือบดำ (สำหรับ Text หลัก) */
+  
+  --accent-color: #d32f2f;       /* สีแดงเข้ม (Emergency/Stroke alert) */
+  --accent-light: #ffcdd2;       /* สีแดงอ่อน (พื้นหลัง Alert) */
 
-  --color-text: #4a4a4a;
-  --color-text-light: #777;
-  --color-bg: #fdfdfd;
-  --color-sidebar-bg: #ffffff;
-  --color-border: #eeeeee;
+  --bg-color: #f0f2f5;           /* สีพื้นหลังเว็บ (เทาฟ้าอ่อนๆ สบายตา) */
+  --sidebar-bg: linear-gradient(180deg, #1a237e 0%, #0d1546 100%); /* ไล่เฉด Sidebar */
+  
+  --text-color: #37474f;
+  --text-muted: #78909c;
+  --border-color: #cfd8dc;
 
   --font-family: 'Sarabun', sans-serif;
-  --font-base-size: 1.125rem; /* 18px */
-  --border-radius: 0.375rem;
+  --card-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+  --border-radius: 12px;         /* ความมนของกล่อง */
 }
 
-/* --- 2. สไตล์หลักของ Body (ใช้ฟอนต์ใหญ่) --- */
+/* --- 2. สไตล์หลักของ Body --- */
 body {
   font-family: var(--font-family);
-  font-size: var(--font-base-size); /* ใช้ฟอนต์พื้นฐาน 18px */
-  line-height: 1.6; /* เพิ่มความสูงระหว่างบรรทัดให้อ่านง่าย */
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  display: flex;
+  font-size: 16px; 
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  overflow-x: hidden;
 }
 
-/* --- 3. Sidebar (เมนูด้านข้าง) --- */
+/* --- 3. Sidebar (ปรับใหม่ให้ดู Professional) --- */
 .sidebar {
   width: 260px;
   position: fixed;
   top: 0;
   left: 0;
   height: 100vh;
-  background-color: var(--color-sidebar-bg);
-  border-right: 1px solid var(--color-border);
-  padding: 1.5rem 1rem;
-  overflow-y: auto;
-  transition: width 0.3s ease;
+  background: var(--sidebar-bg);
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  z-index: 1000;
 }
 
 .sidebar-header {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: white;
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   display: flex;
   align-items: center;
+  letter-spacing: 0.5px;
 }
 
 .sidebar-header i {
-  margin-right: 0.75rem;
+  color: #ff5252; /* หัวใจสีแดงโดดเด่นบนพื้นน้ำเงิน */
+  margin-right: 10px;
+  font-size: 1.6rem;
 }
 
 .sidebar a {
-  display: flex; /* จัดไอคอนและข้อความให้อยู่ในแนวเดียวกัน */
+  display: flex;
   align-items: center;
-  padding: 0.85rem 1rem; /* เพิ่มพื้นที่ให้คลิกง่าย */
+  padding: 12px 25px;
   text-decoration: none;
-  color: var(--color-text-light);
-  border-radius: var(--border-radius);
-  margin-bottom: 0.5rem;
-  transition: all 0.2s ease-in-out;
-}
-
-.sidebar a i {
-  margin-right: 0.75rem; /* ระยะห่างไอคอน */
-  font-size: 1.1em;
+  color: rgba(255,255,255,0.7);
+  font-weight: 400;
+  transition: all 0.2s ease;
+  border-left: 4px solid transparent;
 }
 
 .sidebar a:hover {
-  background-color: var(--color-bg);
-  color: var(--color-primary);
-  padding-left: 1.5rem; /* <-- เพิ่มบรรทัดนี้ (ลูกเล่นขยับขวา) */
+  background: rgba(255,255,255,0.05);
+  color: white;
+  padding-left: 30px; /* ขยับขวาเล็กน้อย */
 }
 
 .sidebar a.active {
-  background-color: var(--color-primary);
-  color: #ffffff;
-  font-weight: 500;
+  background: rgba(255,255,255,0.1);
+  color: white;
+  border-left-color: #ff5252; /* แถบแดงด้านซ้าย */
+  font-weight: 600;
 }
 
-.sidebar a.text-danger:hover {
-  background-color: #fff2f2;
-  color: var(--color-danger);
-  padding-left: 1.5rem; /* <-- เพิ่มบรรทัดนี้ (ลูกเล่นขยับขวา) */
+.sidebar-divider {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin: 1rem 1.5rem;
 }
 
-.sidebar .sidebar-divider {
-  margin: 1rem 0;
-  border-top: 1px solid var(--color-border);
-}
-
-/* --- 4. พื้นที่เนื้อหาหลัก (Main) --- */
+/* --- 4. Main Content --- */
 .main {
-  margin-left: 260px; /* ต้องตรงกับความกว้าง Sidebar */
-  width: calc(100% - 260px);
-  padding: 2rem;
+  margin-left: 260px;
+  padding: 30px;
+  min-height: 100vh;
 }
 
-/* --- 5. ส่วนหัวของหน้า (Header Section) --- */
+/* --- 5. Header Section (หัวข้อหน้า) --- */
 .header-section {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: var(--card-shadow);
   display: flex;
   align-items: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 1.5rem;
+  border-left: 5px solid var(--primary-color);
 }
 
-.header-section .icon-container {
-  font-size: 2.5rem;
-  color: var(--color-primary);
-  margin-right: 1.5rem;
-  background-color: #fff8f0; /*(*** เปลี่ยนสีพื้นหลังไอคอน ***) */
-  border-radius: 10px;
-  width: 70px;
-  height: 70px;
+.icon-container {
+  width: 60px;
+  height: 60px;
+  background-color: #e8eaf6; /* พื้นหลังไอคอนสีฟ้าจางๆ */
+  color: var(--primary-color);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.8rem;
+  margin-right: 20px;
 }
 
-.header-section .title-container {
-  flex-grow: 1; /* ดันส่วน User ไปด้านขวา */
-}
-
-.header-section h1 {
-  font-weight: 600;
-  color: #222;
+.title-container h1 {
   margin: 0;
-  font-size: 2.25rem; /* เพิ่มขนาด H1 */
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
 }
 
-.header-section .subtitle {
-  font-size: 1.1rem;
-  color: var(--color-text-light);
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
 }
 
-/* (สำหรับหน้า index.php) */
-.header-section .navbar-text {
-  color: var(--color-text-light) !important;
+/* --- 6. Cards & Layout (สำคัญมากสำหรับการจัดกลุ่มข้อมูล) --- */
+
+/* ใช้ Class นี้ครอบกลุ่มฟอร์มแต่ละเรื่อง */
+.card-form {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 25px;
+  margin-bottom: 25px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid #e0e0e0;
 }
 
-.header-section .navbar-text i {
-  color: var(--color-primary);
-  font-size: 1.5rem; /* ขยายไอคอน User */
-  margin-right: 0.75rem;
+/* สำหรับส่วนที่สำคัญมาก เช่น Fast Track / ER Alert */
+.card-alert {
+  border: 1px solid var(--accent-color);
+  background-color: #fffafa;
+}
+.card-alert .section-title {
+  color: var(--accent-color);
+  border-bottom-color: rgba(211, 47, 47, 0.2);
 }
 
-/* --- 6. หัวข้อย่อย (Section Title) --- */
 .section-title {
-  font-size: 1.4rem; /* เพิ่มขนาด */
-  font-weight: 600;
-  color: var(--color-text);
-  margin-top: 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--secondary-color);
   margin-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 10px;
   display: flex;
   align-items: center;
-  border-bottom: 2px solid var(--color-border);
-  padding-bottom: 0.5rem;
 }
 
 .section-title i {
-  margin-right: 0.75rem;
-  color: var(--color-primary);
-  font-size: 1.1em;
+  color: var(--primary-color);
+  margin-right: 10px;
+  background: #e3f2fd;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
-/* --- 7. ปรับสไตล์ Bootstrap (Override) --- */
+/* --- 7. Form Elements --- */
+.form-label {
+  font-weight: 600;
+  color: #455a64;
+  font-size: 0.9rem;
+}
 
-/* Buttons (ปุ่ม) */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #cfd8dc;
+  padding: 10px 15px;
+  font-size: 0.95rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.15);
+}
+
+/* --- 8. Buttons --- */
 .btn {
-  font-size: 1rem; /* ขนาดฟอนต์ในปุ่ม */
-  padding: 0.6rem 1.25rem; /* เพิ่มขนาดปุ่มให้คลิกง่าย */
-  font-weight: 500;
-  border-radius: var(--border-radius);
+  border-radius: 50px; /* ปุ่มมน */
+  padding: 8px 24px;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s;
 }
 
 .btn-primary {
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
+  background-color: var(--primary-color);
+  border: none;
+  box-shadow: 0 4px 6px rgba(26, 35, 126, 0.3);
 }
+
 .btn-primary:hover {
-  background-color: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
+  background-color: #303f9f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(26, 35, 126, 0.4);
 }
 
-/* Badge (ป้ายสถานะ) */
-.badge {
-  font-size: 0.9em;
-  font-weight: 500;
-  padding: 0.5em 0.75em;
-}
-.bg-success {
-  background-color: var(--color-success) !important;
-}
-.bg-warning {
-  background-color: var(--color-warning) !important;
-  color: var(--color-text) !important; /* สีส้มพาสเทลต้องใช้ตัวหนังสือเข้ม */
-}
-.bg-danger {
-  background-color: var(--color-danger) !important;
+.btn-success {
+  background-color: #2e7d32;
+  border: none;
 }
 
-/* Forms (ฟอร์ม) */
-.form-label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #333;
+/* ปุ่ม Toggle เลือก Yes/No สวยๆ */
+.btn-toggle-custom {
+  border-radius: 8px !important;
+  border: 1px solid #bdbdbd;
+  color: #757575;
+  background: white;
+  padding: 10px 0;
+  width: 100px;
+}
+.btn-check:checked + .btn-toggle-custom {
+  border-color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 
-.form-control,
-.form-select {
-  font-size: 1rem;
-  padding: 0.85rem 1rem; /* เพิ่มความสูงให้ Input */
-  border: 1px solid #ccc; /* เส้นขอบชัดขึ้นเล็กน้อย */
-  border-radius: var(--border-radius);
+/* ถ้าเลือก Fast Track YES ให้เป็นสีแดง */
+#fast_track_yes:checked + .btn-toggle-custom {
+  background-color: var(--accent-color);
+  border-color: var(--accent-color);
 }
 
-.form-control:focus,
-.form-select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.25rem rgba(118, 169, 224, 0.25);
-}
-
-.form-check-input {
-  width: 1.25em; /* ขยายขนาด Checkbox/Radio */
-  height: 1.25em;
-  margin-top: 0.2em;
-}
-.form-check-label {
-  margin-left: 0.5em; /* ขยับข้อความให้ห่าง */
-}
-.form-check {
-  margin-bottom: 0.5rem;
-}
-
-/* Table (ตาราง) */
+/* --- 9. Table --- */
 .table {
-  border-color: var(--color-border);
-  font-size: 1rem;
-}
-.table th {
-  font-weight: 600;
-  color: #222;
-  padding: 1rem; /* เพิ่มช่องว่างในตาราง */
-}
-.table td {
-  padding: 1rem;
   vertical-align: middle;
 }
+.table thead th {
+  background-color: #f5f7fa;
+  color: var(--secondary-color);
+  font-weight: 700;
+  border-bottom: 2px solid #cfd8dc;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+}
 .table-hover tbody tr:hover {
-  background-color: #f7faff; /* สีฟ้าอ่อนเมื่อ Hover */
-}
-.table-light {
-  background-color: #fcfcfc;
-  border-color: var(--color-border);
+  background-color: #e8eaf6; /* ฟ้าอ่อนมาก */
 }
 
-/* Modal (หน้าต่าง Pop-up) */
-.modal-content {
-  border: none;
-  border-radius: var(--border-radius);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+/* --- 10. SweetAlert Adjustments --- */
+div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+  background-color: var(--primary-color) !important;
 }
-.modal-header {
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-}
-.modal-title {
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-/* Card (การ์ด) */
-.card {
-  border: 1px solid var(--color-border);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
-  border-radius: var(--border-radius);
-}
-
-/* --- 8. สไตล์เฉพาะ (ถ้ามี) --- */
-/* (ไม่มีในไฟล์ตัวอย่าง) */

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connectdb.php'; // อย่าลืมเปลี่ยนเป็นชื่อไฟล์ connect ของคุณ (เช่น connectdb.php)
+require_once 'connectdb.php'; 
 
 // ฟังก์ชันรวม Date + Time
 function combineDateTime($date, $time) {
@@ -16,117 +16,121 @@ function checkVal($field_name) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // เปิด Error Reporting เพื่อช่วยหาจุดผิดพลาด (เอาออกได้เมื่อใช้งานจริง)
+    mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    // 1. รับค่า admission_id (หัวใจสำคัญ!)
-    $admission_id = $_POST['admission_id'];
+    try {
+        // 1. รับค่า admission_id
+        $admission_id = $_POST['admission_id'] ?? '';
 
-    if (empty($admission_id)) {
-        echo json_encode(['status' => 'error', 'message' => 'Missing Admission ID']);
-        exit;
-    }
+        if (empty($admission_id)) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing Admission ID']);
+            exit;
+        }
 
-    // 2. รับค่าเวลาต่างๆ (Section 1-4)
-    // หมายเหตุ: ชื่อตัวแปร $_POST มาจาก name="..." ในฟอร์มของคุณ
-    
-    // 1. เวลาส่งต่อ
-    $transfer_departure_datetime = combineDateTime($_POST['arrivalTime'] ?? '', $_POST['arrivalTime_time'] ?? '');
-    $transfer_arrival_datetime = combineDateTime($_POST['arrivalTime_datetime'] ?? '', $_POST['arrivalTime_time_destination'] ?? '');
+        // 2. รับค่าเวลาต่างๆ
+        $transfer_departure_datetime = combineDateTime($_POST['arrivalTime'] ?? '', $_POST['arrivalTime_time'] ?? '');
+        $transfer_arrival_datetime = combineDateTime($_POST['arrivalTime_datetime'] ?? '', $_POST['arrivalTime_time_destination'] ?? '');
+        $consult_neuro_datetime = combineDateTime($_POST['consult_neuro_date'] ?? '', $_POST['consult_neuro_time_input'] ?? '');
+        
+        $ctnc_datetime = combineDateTime($_POST['ctncDate'] ?? '', $_POST['ctncTime_input'] ?? '');
+        $cta_datetime = combineDateTime($_POST['ctaTime'] ?? '', $_POST['ctaTime_input'] ?? '');
+        $mri_datetime = combineDateTime($_POST['mriTime'] ?? '', $_POST['mriTime_input'] ?? '');
+        
+        $consult_intervention_datetime = combineDateTime($_POST['consult_intervention_time'] ?? '', $_POST['consult_intervention_time_input'] ?? '');
 
-    // 2. ปรึกษา Neuro
-    $consult_neuro_datetime = combineDateTime($_POST['consult_neuro_date'] ?? '', $_POST['consult_neuro_time_input'] ?? ''); // *** อย่าลืมไปเติม name ในฟอร์มนะ
+        // 3. รับค่าผลตรวจ
+        $aspect_score = $_POST['aspect'] ?? null;
+        $collateral_score = $_POST['collateral'] ?? null;
+        $occlusion_site = $_POST['occlusionLocation'] ?? null;
+        $ct_result = $_POST['ctResult'] ?? null;
 
-    // 3. Imaging
-    $ctnc_datetime = combineDateTime($_POST['ctncDate'] ?? '', $_POST['ctncTime_input'] ?? ''); // *** เติม name
-    $cta_datetime = combineDateTime($_POST['ctaTime'] ?? '', $_POST['ctaTime_input'] ?? '');   // *** เติม name
-    $mri_datetime = combineDateTime($_POST['mriTime'] ?? '', $_POST['mriTime_input'] ?? '');   // *** เติม name
+        // 4. รับค่าการรักษา
+        $fibrinolytic_type = $_POST['fibrinolytic_type'] ?? null;
+        $tpa_start_time = $_POST['tpaTime'] ?? null;
+        
+        $anesthesia_set_datetime = combineDateTime($_POST['anesthesiaTime_date'] ?? '', $_POST['anesthesiaTime_time'] ?? ''); 
+        $activate_team_datetime = combineDateTime($_POST['punctureTime_date'] ?? '', $_POST['punctureTime_time'] ?? '');
 
-    // 4. Intervention
-    $consult_intervention_datetime = combineDateTime($_POST['consult_intervention_time'] ?? '', $_POST['consult_intervention_time_input'] ?? ''); // *** เติม name
+        $consult_neurosurgeon = checkVal('consultNS');
 
-    // 3. รับค่าผลตรวจ (Section 5)
-    $aspect_score = $_POST['aspect'] ?? null;
-    $collateral_score = $_POST['collateral'] ?? null;
-    $occlusion_site = $_POST['occlusionLocation'] ?? null;
-    $ct_result = $_POST['ctResult'] ?? null; // ischemic / hemorrhagic
+        // รับชื่อผู้ใช้
+        $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System'; 
 
-    // 4. รับค่าการรักษา (Section 6)
-    // Ischemic
-    $fibrinolytic_type = $_POST['fibrinolytic_type'] ?? null;
-    $tpa_start_time = $_POST['tpaTime'] ?? null; // รับแค่เวลา
-    
-    // *** (ในฟอร์มเดิมคุณมี input date/time แยกกันสำหรับ anesthesia/puncture ผมรวมให้นะ)
-    $anesthesia_set_datetime = combineDateTime($_POST['anesthesiaTime_date'] ?? '', $_POST['anesthesiaTime_time'] ?? ''); 
-    $activate_team_datetime = combineDateTime($_POST['punctureTime_date'] ?? '', $_POST['punctureTime_time'] ?? '');
+        $sql = "INSERT INTO tbl_er (
+                    admission_id,
+                    transfer_departure_datetime, transfer_arrival_datetime,
+                    consult_neuro_datetime,
+                    ctnc_datetime, cta_datetime, mri_datetime,
+                    consult_intervention_datetime,
+                    aspect_score, collateral_score, occlusion_site, ct_result,
+                    fibrinolytic_type, tpa_start_time,
+                    anesthesia_set_datetime, activate_team_datetime,
+                    consult_neurosurgeon,
+                    created_by, created_at, updated_by, updated_at
+                ) VALUES (
+                    ?, 
+                    ?, ?, 
+                    ?, 
+                    ?, ?, ?, 
+                    ?, 
+                    ?, ?, ?, ?, 
+                    ?, ?, 
+                    ?, ?, 
+                    ?, 
+                    ?, NOW(), ?, NOW()
+                ) 
+                ON DUPLICATE KEY UPDATE 
+                    transfer_departure_datetime = VALUES(transfer_departure_datetime),
+                    ct_result = VALUES(ct_result),
+                    aspect_score = VALUES(aspect_score),
+                    occlusion_site = VALUES(occlusion_site),
+                    fibrinolytic_type = VALUES(fibrinolytic_type),
+                    updated_by = VALUES(updated_by),
+                    updated_at = NOW()
+                ";
 
-    // Hemorrhagic
-    $consult_neurosurgeon = checkVal('consultNS'); // checkbox
+        $stmt = $conn->prepare($sql);
 
-    $created_by = $_SESSION['user_data']['name'] ?? 'System';
+        // *** แก้ไข: ใช้ bind_param ชุดเดียว และต้องมีตัวแปรครบ 19 ตัว ***
+        // i = int, s = string
+        // ลำดับ: id(1) + times(7) + scores(2) + text(2) + fib/tpa(2) + times(2) + consult(1) + users(2) = 19
+        
+        $stmt->bind_param("isssssssiissssssiss", 
+            $admission_id,
+            $transfer_departure_datetime, 
+            $transfer_arrival_datetime,
+            $consult_neuro_datetime,
+            $ctnc_datetime, 
+            $cta_datetime, 
+            $mri_datetime,
+            $consult_intervention_datetime,
+            $aspect_score, 
+            $collateral_score, 
+            $occlusion_site, 
+            $ct_result,
+            $fibrinolytic_type, 
+            $tpa_start_time,
+            $anesthesia_set_datetime, 
+            $activate_team_datetime,
+            $consult_neurosurgeon,
+            $current_user, // created_by
+            $current_user  // updated_by
+        );
 
-    // ========================================================
-    // บันทึกข้อมูล (ใช้ INSERT ON DUPLICATE KEY UPDATE เพื่อรองรับการแก้ไขซ้ำ)
-    // ========================================================
-    
-    $sql = "INSERT INTO tbl_er (
-                admission_id,
-                transfer_departure_datetime, transfer_arrival_datetime,
-                consult_neuro_datetime,
-                ctnc_datetime, cta_datetime, mri_datetime,
-                consult_intervention_datetime,
-                aspect_score, collateral_score, occlusion_site, ct_result,
-                fibrinolytic_type, tpa_start_time,
-                anesthesia_set_datetime, activate_team_datetime,
-                consult_neurosurgeon,
-                created_by
-            ) VALUES (
-                ?, 
-                ?, ?, 
-                ?, 
-                ?, ?, ?, 
-                ?, 
-                ?, ?, ?, ?, 
-                ?, ?, 
-                ?, ?, 
-                ?, 
-                ?
-            ) 
-            ON DUPLICATE KEY UPDATE 
-                transfer_departure_datetime = VALUES(transfer_departure_datetime),
-                ct_result = VALUES(ct_result),
-                aspect_score = VALUES(aspect_score),
-                occlusion_site = VALUES(occlusion_site),
-                fibrinolytic_type = VALUES(fibrinolytic_type)
-                -- (จริงๆ ควร UPDATE ให้ครบทุกฟิลด์ แต่ละไว้ฐานเข้าใจ)
-            ";
+        if ($stmt->execute()) {
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'บันทึกข้อมูล ER สำเร็จ!',
+                'redirect_url' => 'OR_Procedure_Form.php?admission_id=' . $admission_id
+            ]);
+        } else {
+            throw new Exception($stmt->error);
+        }
 
-    $stmt = $conn->prepare($sql);
-
-    // Type String: i (id) + 7s (times) + 2i (scores) + 2s (text/enum) + 2s (fib/tpa) + 2s (times) + 1i (consult) + 1s (create)
-    // รวม: 1+7+2+2+2+2+1+1 = 18 ตัว
-    
-    $stmt->bind_param("isssssssiissssssis", 
-        $admission_id,
-        $transfer_departure_datetime, $transfer_arrival_datetime,
-        $consult_neuro_datetime,
-        $ctnc_datetime, $cta_datetime, $mri_datetime,
-        $consult_intervention_datetime,
-        $aspect_score, $collateral_score, $occlusion_site, $ct_result,
-        $fibrinolytic_type, $tpa_start_time,
-        $anesthesia_set_datetime, $activate_team_datetime,
-        $consult_neurosurgeon,
-        $created_by
-    );
-
-    if ($stmt->execute()) {
-        echo json_encode([
-            'status' => 'success', 
-            'message' => 'บันทึกข้อมูล ER สำเร็จ!',
-            'redirect_url' => 'OR_Procedure_Form.php?admission_id=' . $admission_id // ไปหน้า 3
-        ]);
-    } else {
+    } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['status' => 'error', 'message' => $stmt->error]);
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
-
 }
 ?>

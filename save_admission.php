@@ -35,7 +35,7 @@ function convertThaiDateToMySQL($dateString) {
     // 2. กรณีเป็นภาษาไทย (30 กรกฎาคม 2521)
     $thaiMonths = [
         'มกราคม'=>'01', 'กุมภาพันธ์'=>'02', 'มีนาคม'=>'03', 'เมษายน'=>'04', 'พฤษภาคม'=>'05', 'มิถุนายน'=>'06',
-        'กรกฎาคม'=>'07', 'สิงหาคม'=>'08', 'กันยายน'=>'09', 'ตุลาคม'=>'10', 'พฤศจิกายน'=>'11', 'ธันวาคม'=>'12',
+        'กรกฎาคม'=>'07', 'กรกฏาคม'=>'07','สิงหาคม'=>'08', 'กันยายน'=>'09', 'ตุลาคม'=>'10', 'พฤศจิกายน'=>'11', 'ธันวาคม'=>'12',
         'ม.ค.'=>'01', 'ก.พ.'=>'02', 'มี.ค.'=>'03', 'เม.ย.'=>'04', 'พ.ค.'=>'05', 'มิ.ย.'=>'06',
         'ก.ค.'=>'07', 'ส.ค.'=>'08', 'ก.ย.'=>'09', 'ต.ค.'=>'10', 'พ.ย.'=>'11', 'ธ.ค.'=>'12'
     ];
@@ -61,7 +61,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // =================================================================
     // PART 1: รับค่าและเตรียมข้อมูลสำหรับ tbl_patient
     // =================================================================
-
+    // ดึงชื่อผู้ใช้ (ลองหา hr_fname ก่อน ถ้าไม่มีหา name ถ้าไม่มีอีกให้เป็น System)
+$created_by = $_SESSION['user_data']['hr_fname'] ?? $_SESSION['user_data']['hr_fname'] ?? 'System'; 
     $hn = $_POST['hn'];
     $id_card = $_POST['id_card'] ?? null;
     $flname = $_POST['flname'] ?? null;
@@ -135,27 +136,38 @@ if (empty($birthdate)) {
     $check_result = $check_stmt->get_result();
 
     if ($check_result->num_rows > 0) {
-        // --- กรณี A: มีแล้ว -> UPDATE ---
+        // --- กรณี A: มีแล้ว -> UPDATE (เพิ่ม updated_by, updated_at) ---
         $sql_patient = "UPDATE tbl_patient SET 
-                        id_card = ?, flname = ?, birthdate = ?, gender = ?, age = ?
-                       ,blood_type = ?, address_full = ?, other_id_type = ?, 
-                        other_id_number = ?, treatment_scheme = ?
+                        id_card = ?, flname = ?, birthdate = ?, gender = ?, age = ?,
+                        blood_type = ?, address_full = ?, other_id_type = ?, 
+                        other_id_number = ?, treatment_scheme = ?,
+                        updated_by = ?, updated_at = NOW()  -- << เพิ่มตรงนี้
                         WHERE hn = ?";
         $stmt = $conn->prepare($sql_patient);
-        $stmt->bind_param("sssssssssss", 
-            $id_card, $flname, $birthdate, $gender,$age, 
+        
+        // bind_param: เพิ่ม s (updated_by) ก่อนตัวสุดท้าย (hn)
+        // เดิม 11 ตัว -> ใหม่ 12 ตัว (ssssssssssss)
+        $stmt->bind_param("ssssssssssss", 
+            $id_card, $flname, $birthdate, $gender, $age, 
             $blood_type, $address_full, $other_id_type, 
-            $other_id_number, $treatment_scheme, $hn
+            $other_id_number, $treatment_scheme, 
+            $created_by, // updated_by (ใช้ตัวแปรเดียวกัน)
+            $hn
         );
     } else {
-        // --- กรณี B: ยังไม่มี -> INSERT ---
+        // --- กรณี B: ยังไม่มี -> INSERT (เพิ่ม created_by, updated_by และเวลา) ---
         $sql_patient = "INSERT INTO tbl_patient 
-                        (hn, id_card, flname, birthdate, gender,age, blood_type, address_full, other_id_type, other_id_number, treatment_scheme) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+                        (hn, id_card, flname, birthdate, gender, age, blood_type, address_full, other_id_type, other_id_number, treatment_scheme, created_by, created_at, updated_by, updated_at) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW())"; // << เพิ่ม ?
         $stmt = $conn->prepare($sql_patient);
-        $stmt->bind_param("sssssssssss", 
-            $hn, $id_card, $flname, $birthdate, $gender,$age, 
-            $blood_type, $address_full, $other_id_type, $other_id_number, $treatment_scheme
+        
+        // bind_param: เพิ่ม s 2 ตัวท้าย (created_by, updated_by)
+        // เดิม 11 ตัว -> ใหม่ 13 ตัว (sssssssssssss)
+        $stmt->bind_param("sssssssssssss", 
+            $hn, $id_card, $flname, $birthdate, $gender, $age, 
+            $blood_type, $address_full, $other_id_type, $other_id_number, $treatment_scheme,
+            $created_by, // created_by
+            $updated_by // updated_by
         );
     }
 
@@ -222,77 +234,116 @@ if (empty($birthdate)) {
     $onset_datetime = combineDateTime($_POST['onsetTime_onset_date'] ?? '', $_POST['onsetTime_onset_time'] ?? '');
     $departure_datetime = combineDateTime($_POST['departureTime_date'] ?? '', $_POST['departureTime_time'] ?? '');
     $hospital_arrival_datetime = combineDateTime($_POST['arrivalTime_date'] ?? '', $_POST['arrivalTime_time'] ?? '');
-
+    $updated_by = $created_by;
     $created_by = $_SESSION['user_data']['name'] ?? 'System';
 
 
+// =================================================================
+    // PART 4: บันทึกข้อมูล Admission (INSERT หรือ UPDATE)
     // =================================================================
-    // PART 4: บันทึกข้อมูล Admission (INSERT)
-    // =================================================================
 
-   $sql_adm = "INSERT INTO tbl_stroke_admission (
-        patient_hn, 
-        is_ht, is_dm, is_old_cva, is_mi, is_af, is_dlp, is_other_text, 
-        addict_alcohol, addict_smoking,
-        arrival_type, refer_from_hospital, refer_arrival_datetime, ems_first_medical_contact, walk_in_datetime, ipd_ward_name, ipd_onset_datetime,
-        med_anti_platelet, med_asa, med_clopidogrel, med_anti_coagulant, med_warfarin, med_noac,
-        pre_morbid_mrs, fast_track_status,
-        symp_face, symp_arm, symp_speech, symp_vision, symp_aphasia, symp_neglect,
-        gcs_e, gcs_v, gcs_m, nihss_score,
-        onset_datetime, departure_datetime, hospital_arrival_datetime,
-        created_by
-    ) VALUES (
-        ?, 
-        ?, ?, ?, ?, ?, ?, ?,
-        ?, ?,
-        ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?,
-        ?, ?,
-        ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?,
-        ?, ?, ?,
-        ?
-    )";
+    // รับค่า admission_id เพื่อเช็คว่าเป็น เพิ่มใหม่ หรือ แก้ไข
+    $admission_id = $_POST['admission_id'] ?? '';
 
-   $stmt_adm = $conn->prepare($sql_adm);
+    if (!empty($admission_id)) {
+        // ---------------------------------------------------------
+        // กรณี A: มี ID ส่งมา = "แก้ไขข้อมูลเดิม (UPDATE)"
+        // ---------------------------------------------------------
+        $sql_adm = "UPDATE tbl_stroke_admission SET 
+            patient_hn=?, 
+            is_ht=?, is_dm=?, is_old_cva=?, is_mi=?, is_af=?, is_dlp=?, is_other_text=?, 
+            addict_alcohol=?, addict_smoking=?,
+            arrival_type=?, refer_from_hospital=?, refer_arrival_datetime=?, ems_first_medical_contact=?, walk_in_datetime=?, ipd_ward_name=?, ipd_onset_datetime=?,
+            med_anti_platelet=?, med_asa=?, med_clopidogrel=?, med_anti_coagulant=?, med_warfarin=?, med_noac=?,
+            pre_morbid_mrs=?, fast_track_status=?,
+            symp_face=?, symp_arm=?, symp_speech=?, symp_vision=?, symp_aphasia=?, symp_neglect=?,
+            gcs_e=?, gcs_v=?, gcs_m=?, nihss_score=?,
+            onset_datetime=?, departure_datetime=?, hospital_arrival_datetime=?,
+            updated_by=?
+            WHERE id=?";
 
-    // การ Bind param ต้องนับจำนวนตัวแปรและชนิดข้อมูลให้ตรงเป๊ะ
-    // s = string, i = integer, d = double
-    // (ในที่นี้ส่วนใหญ่เป็น string และ int แต่ Datetime ใช้ string ได้)
-    
-    // เทคนิค: เพื่อนับง่ายๆ ผมรวม Type string ไว้ (ลองนับดูมี 39 ตัวแปร)
-    // s (hn) + 7i (comorbid) + 1s (text) + 2i (addict) + 1s (arrival) + 1s (refer) + 5s (times) + 6i (meds) + 1i (mrs) + 1s (fast) + 6i (symp) + 4i (scores) + 3s (main times) + 1s (created_by)
-    
-    // Type String: "siiiiiiisiiissssssiiiiiiisiiiiiiiiiissss" (ตัวอย่างคร่าวๆ)
-    // เพื่อความชัวร์ ผมจะใช้ bind_param แบบยาว
-    
-   $stmt_adm->bind_param("siiiiiisiisssssssiiiiiiisiiiiiiiiiissss", 
-        $hn,                                      // s
-        $comorbid_ht, $comorbid_dm, $old_cva, $comorbid_mi, $comorbid_af, $comorbid_dlp, // iiiiii
-        $comorbid_other_text,                     // s
-        $addict_alcohol, $addict_smoking,         // ii
-        $arrival_type, $refer_from_hospital, $refer_arrival_datetime, $ems_first_medical_contact, $er_arrival_datetime, $ipd_ward_name, $ipd_onset_datetime, // sssssss
-        $med_anti_platelet, $med_asa, $med_clopidogrel, $med_anti_coagulant, $med_warfarin, $med_noac, // iiiiii
-        $pre_morbid_mrs, $fast_track_status,      // is
-        $symp_face, $symp_arm, $symp_speech, $symp_vision, $symp_aphasia, $symp_neglect, // iiiiii
-        $gcs_e, $gcs_v, $gcs_m, $nihss_score,     // iiii
-        $onset_datetime, $departure_datetime, $hospital_arrival_datetime, // sss
-        $created_by                               // s
-    );
+        $stmt_adm = $conn->prepare($sql_adm);
+
+        // Type String: เหมือน Insert แต่ตัด created_by ออก (1 ตัว) และเพิ่ม id ต่อท้าย (1 ตัว) = 40 ตัวเท่าเดิม
+        // แต่ตำแหน่ง updated_by จะเลื่อนมา และ id จะมาปิดท้าย
+        // s iiiiii s ii sssssss iiiiii i s iiiiii iiii sss s i
+        $types = "siiiiiisiisssssssiiiiiiisiiiiiiiiiissssi";
+
+        $stmt_adm->bind_param($types, 
+            $hn,                                      
+            $comorbid_ht, $comorbid_dm, $old_cva, $comorbid_mi, $comorbid_af, $comorbid_dlp, 
+            $comorbid_other_text,                     
+            $addict_alcohol, $addict_smoking,         
+            $arrival_type, $refer_from_hospital, $refer_arrival_datetime, $ems_first_medical_contact, $er_arrival_datetime, $ipd_ward_name, $ipd_onset_datetime, 
+            $med_anti_platelet, $med_asa, $med_clopidogrel, $med_anti_coagulant, $med_warfarin, $med_noac, 
+            $pre_morbid_mrs, $fast_track_status,      
+            $symp_face, $symp_arm, $symp_speech, $symp_vision, $symp_aphasia, $symp_neglect, 
+            $gcs_e, $gcs_v, $gcs_m, $nihss_score,     
+            $onset_datetime, $departure_datetime, $hospital_arrival_datetime, 
+            $updated_by,   // อัพเดทเฉพาะคนแก้ไข
+            $admission_id  // WHERE id (Integer)
+        );
+
+    } else {
+        // ---------------------------------------------------------
+        // กรณี B: ไม่มี ID = "เพิ่มข้อมูลใหม่ (INSERT)"
+        // ---------------------------------------------------------
+        $sql_adm = "INSERT INTO tbl_stroke_admission (
+            patient_hn, 
+            is_ht, is_dm, is_old_cva, is_mi, is_af, is_dlp, is_other_text, 
+            addict_alcohol, addict_smoking,
+            arrival_type, refer_from_hospital, refer_arrival_datetime, ems_first_medical_contact, walk_in_datetime, ipd_ward_name, ipd_onset_datetime,
+            med_anti_platelet, med_asa, med_clopidogrel, med_anti_coagulant, med_warfarin, med_noac,
+            pre_morbid_mrs, fast_track_status,
+            symp_face, symp_arm, symp_speech, symp_vision, symp_aphasia, symp_neglect,
+            gcs_e, gcs_v, gcs_m, nihss_score,
+            onset_datetime, departure_datetime, hospital_arrival_datetime,
+            created_by, updated_by
+        ) VALUES (
+            ?, 
+            ?, ?, ?, ?, ?, ?, ?,
+            ?, ?,
+            ?, ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?, ?,
+            ?, ?, ?, ?, ?, ?,
+            ?, ?, ?, ?,
+            ?, ?, ?,
+            ?, ?
+        )";
+
+        $stmt_adm = $conn->prepare($sql_adm);
+
+        // Type String: 40 ตัว (เหมือนเดิมเป๊ะ)
+        $stmt_adm->bind_param("siiiiiisiisssssssiiiiiiisiiiiiiiiiisssss", 
+            $hn,                                      
+            $comorbid_ht, $comorbid_dm, $old_cva, $comorbid_mi, $comorbid_af, $comorbid_dlp, 
+            $comorbid_other_text,                     
+            $addict_alcohol, $addict_smoking,         
+            $arrival_type, $refer_from_hospital, $refer_arrival_datetime, $ems_first_medical_contact, $er_arrival_datetime, $ipd_ward_name, $ipd_onset_datetime, 
+            $med_anti_platelet, $med_asa, $med_clopidogrel, $med_anti_coagulant, $med_warfarin, $med_noac, 
+            $pre_morbid_mrs, $fast_track_status,      
+            $symp_face, $symp_arm, $symp_speech, $symp_vision, $symp_aphasia, $symp_neglect, 
+            $gcs_e, $gcs_v, $gcs_m, $nihss_score,     
+            $onset_datetime, $departure_datetime, $hospital_arrival_datetime, 
+            $created_by,                              
+            $updated_by                               
+        );
+    }
+
+    // --- สั่ง Execute ---
     if ($stmt_adm->execute()) {
-        // --- สำเร็จ ---
-        $new_admission_id = $conn->insert_id;
         
-        // ✅ ใส่อันใหม่: ส่ง JSON กลับไปบอกหน้าเว็บ
+        // ถ้าเป็นการ Insert ให้เอา ID ใหม่มา, ถ้า Update ให้ใช้ ID เดิม
+        $redirect_id = !empty($admission_id) ? $admission_id : $conn->insert_id;
+
         echo json_encode([
             'status' => 'success',
             'message' => 'บันทึกข้อมูลสำเร็จ!',
-            'redirect_url' => 'diagnosis_form.php?admission_id=' . $new_admission_id
+            'redirect_url' => 'diagnosis_form.php?admission_id=' . $redirect_id
         ]);
         exit;
-
     } else {
-        // ส่ง JSON แจ้ง Error
         http_response_code(500);
         echo json_encode([
             'status' => 'error', 

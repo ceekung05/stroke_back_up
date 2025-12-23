@@ -3,6 +3,9 @@ session_start();
 require_once 'connectdb.php';
 header('Content-Type: application/json');
 
+// 1. รับชื่อผู้ใช้งาน
+$current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
+
 $action = $_POST['action'] ?? '';
 $admission_id = $_POST['admission_id'] ?? '';
 
@@ -11,7 +14,7 @@ if (empty($admission_id)) {
     exit;
 }
 
-// --- CASE 1: สร้างนัดอัตโนมัติ (Auto Create) ---
+// --- CASE 1: สร้างนัดอัตโนมัติ (INSERT) ---
 if ($action === 'auto_create') {
     $start_date = $_POST['start_date'] ?? '';
     
@@ -20,34 +23,38 @@ if ($action === 'auto_create') {
         exit;
     }
 
-    // ลบของเก่าทิ้งก่อน (Reset)
     $conn->query("DELETE FROM tbl_followup WHERE admission_id = $admission_id");
 
-    // คำนวณวันนัด (1, 3, 6, 12 เดือน)
     $intervals = [1, 3, 6, 12];
     $base_time = strtotime($start_date);
 
-    $stmt = $conn->prepare("INSERT INTO tbl_followup (admission_id, followup_label, scheduled_date, status) VALUES (?, ?, ?, 'pending')");
+    // แก้ SQL INSERT เพิ่ม created/updated
+    $stmt = $conn->prepare("INSERT INTO tbl_followup (admission_id, followup_label, scheduled_date, status, created_by, created_at, updated_by, updated_at) VALUES (?, ?, ?, 'pending', ?, NOW(), ?, NOW())");
 
     foreach ($intervals as $month) {
         $label = "mRS $month เดือน";
         $next_date = date('Y-m-d', strtotime("+$month month", $base_time));
-        $stmt->bind_param("iss", $admission_id, $label, $next_date);
+        
+        // Bind Param (เพิ่ม user 2 ตัว)
+        $stmt->bind_param("issss", $admission_id, $label, $next_date, $current_user, $current_user);
         $stmt->execute();
     }
 
     echo json_encode(['status' => 'success', 'message' => 'สร้างตารางนัดหมายเรียบร้อย']);
 }
 
-// --- CASE 2: อัปเดตผล (Update Score / Status) ---
+// --- CASE 2: อัปเดตผล (UPDATE) ---
 else if ($action === 'update_item') {
     $followup_id = $_POST['followup_id'];
-    $status = $_POST['status']; // attended, no_show
-    $mrs_score = $_POST['mrs_score'] ?? null; // 0-6 หรือ null
+    $status = $_POST['status']; 
+    $mrs_score = $_POST['mrs_score'] ?? null; 
 
-    $sql = "UPDATE tbl_followup SET status = ?, mrs_score = ? WHERE id = ?";
+    // แก้ SQL UPDATE เพิ่ม updated_by
+    $sql = "UPDATE tbl_followup SET status = ?, mrs_score = ?, updated_by = ?, updated_at = NOW() WHERE id = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sii", $status, $mrs_score, $followup_id);
+    
+    // Bind Param
+    $stmt->bind_param("sisi", $status, $mrs_score, $current_user, $followup_id);
 
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success']);
@@ -56,7 +63,7 @@ else if ($action === 'update_item') {
     }
 }
 
-// --- CASE 3: ดึงข้อมูลล่าสุด (Get List) ---
+// --- CASE 3: ดึงข้อมูล (เหมือนเดิม) ---
 else if ($action === 'get_list') {
     $sql = "SELECT * FROM tbl_followup WHERE admission_id = ? ORDER BY scheduled_date ASC";
     $stmt = $conn->prepare($sql);

@@ -6,7 +6,7 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: login.php");
     exit;
 }
-$user = $_SESSION['user_data'];
+
 
 // --- 1. ตรวจสอบโหมด (เพิ่มใหม่ หรือ แก้ไข) ---
 $admission_id = $_GET['admission_id'] ?? '';
@@ -92,19 +92,19 @@ function dt($field, $type)
         </a>
         <hr class="sidebar-divider">
 
-        <a href="form.php<?= $admission_id ? '?admission_id=' . $admission_id : '' ?>" class="active">
+        <a href="form.php<?= $admission_id ? '?admission_id=' . $admission_id : 'form.php' ?>" class="active">
             <i class="bi bi-person-lines-fill"></i> 1. ข้อมูลทั่วไป
         </a>
-        <a href="<?= $admission_id ? 'diagnosis_form.php?admission_id=' . $admission_id : '#' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
+        <a href="<?= $admission_id ? 'diagnosis_form.php?admission_id=' . $admission_id : 'diagnosis_form.php' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
             <i class="bi bi-hospital"></i> 2. ER
         </a>
-        <a href="<?= $admission_id ? 'OR_Procedure_Form.php?admission_id=' . $admission_id : '#' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
+        <a href="<?= $admission_id ? 'OR_Procedure_Form.php?admission_id=' . $admission_id : 'OR_Procedure_Form.php' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
             <i class="bi bi-scissors"></i> 3. OR Procedure
         </a>
-        <a href="<?= $admission_id ? 'ward.php?admission_id=' . $admission_id : '#' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
+        <a href="<?= $admission_id ? 'ward.php?admission_id=' . $admission_id : 'ward.php' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
             <i class="bi bi-building-check"></i> 4. Ward
         </a>
-        <a href="<?= $admission_id ? 'follow.php?admission_id=' . $admission_id : '#' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
+        <a href="<?= $admission_id ? 'follow.php?admission_id=' . $admission_id : 'follow.php' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
             <i class="bi bi-calendar-check"></i> 5. Follow Up
         </a>
 

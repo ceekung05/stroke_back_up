@@ -2,7 +2,6 @@
 session_start();
 require_once 'connectdb.php'; 
 
-// ฟังก์ชันรวม Date + Time (ยืดหยุ่น)
 function combineDateTime($date, $time) {
     if (empty($date)) return null;
     if (empty($time)) return $date . ' 00:00:00';
@@ -11,42 +10,39 @@ function combineDateTime($date, $time) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    // 1. รับชื่อผู้ใช้งาน
+    $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
+
     $admission_id = $_POST['admission_id'] ?? '';
     if (empty($admission_id)) {
         echo json_encode(['status' => 'error', 'message' => 'ไม่พบ Admission ID']);
         exit;
     }
 
-    // Section 2: CT Follow-up
+    // (รับค่าตัวแปรอื่นๆ เหมือนเดิม...)
     $followup_ct_datetime = combineDateTime($_POST['ct_date'] ?? '', $_POST['ct_time'] ?? '');
     $followup_ct_result = $_POST['ct_result'] ?? null;
-
-    // Section 3: Discharge Assessment
     $discharge_assess_datetime = combineDateTime($_POST['dc_assess_date'] ?? '', $_POST['dc_assess_time'] ?? '');
     $discharge_mrs = $_POST['mrsDischarge'] ?? null;
     $discharge_barthel = $_POST['barthel'] ?? null;
     $discharge_hrs = $_POST['hrs'] ?? null;
+    $discharge_plan_status = $_POST['discharge_planning'] ?? null;
+    $discharge_date = $_POST['discharge_date'] ?? null;
+    $discharge_status = $_POST['discharge_status'] ?? null;
 
-    // Section 4: Discharge Status
-    $discharge_plan_status = $_POST['discharge_planning'] ?? null; // came / not_came
-    $discharge_date = $_POST['discharge_date'] ?? null; // Date only
-    $discharge_status = $_POST['discharge_status'] ?? null; // recovery, improve...
-
-    $created_by = $_SESSION['user_data']['name'] ?? 'System';
-
-    // SQL Insert/Update (1:1)
+    // 2. แก้ไข SQL (เพิ่ม Fields User ทั้ง Insert และ Update)
     $sql = "INSERT INTO tbl_ward (
                 admission_id,
                 followup_ct_datetime, followup_ct_result,
                 discharge_assess_datetime, discharge_mrs, discharge_barthel, discharge_hrs,
                 discharge_plan_status, discharge_date, discharge_status,
-                created_by
+                created_by, created_at, updated_by, updated_at
             ) VALUES (
                 ?, 
                 ?, ?, 
                 ?, ?, ?, ?, 
                 ?, ?, ?, 
-                ?
+                ?, NOW(), ?, NOW()
             )
             ON DUPLICATE KEY UPDATE
                 followup_ct_datetime = VALUES(followup_ct_datetime),
@@ -57,25 +53,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 discharge_hrs = VALUES(discharge_hrs),
                 discharge_plan_status = VALUES(discharge_plan_status),
                 discharge_date = VALUES(discharge_date),
-                discharge_status = VALUES(discharge_status)
+                discharge_status = VALUES(discharge_status),
+                updated_by = VALUES(updated_by), -- อัปเดตชื่อคนแก้
+                updated_at = NOW()               -- อัปเดตเวลา
             ";
 
     $stmt = $conn->prepare($sql);
 
-    // Type String:
-    // i (id)
-    // s (ct_dt) s (ct_res)
-    // s (dc_dt) i (mrs) i (barthel) i (hrs)
-    // s (plan) s (date) s (status)
-    // s (created_by)
-    // รวม: isssiiissss (11 ตัว)
-
-    $stmt->bind_param("isssiiissss", 
+    // 3. แก้ bind_param (เพิ่ม s ท้ายสุด 2 ตัว)
+    // isssiiisssss
+    $stmt->bind_param("isssiiisssss", 
         $admission_id,
         $followup_ct_datetime, $followup_ct_result,
         $discharge_assess_datetime, $discharge_mrs, $discharge_barthel, $discharge_hrs,
         $discharge_plan_status, $discharge_date, $discharge_status,
-        $created_by
+        $current_user, // created_by
+        $current_user  // updated_by
     );
 
     if ($stmt->execute()) {
