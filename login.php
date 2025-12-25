@@ -1,230 +1,194 @@
-<?php
-// 1. เริ่ม session (ต้องอยู่อันแรกเสมอ)
-session_start();
-
-// 2. 🛡️ โค้ดยาม (เช็กว่าล็อกอินอยู่)
-// ถ้าล็อกอินอยู่แล้ว ให้เด้งไป index ทันที
-if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header("Location: index.php");
-    exit;
-}
-
-// 3. 🧠 คำสั่งห้ามจำ (Cache Control)
-// บังคับให้เบราว์เซอร์ต้องมาถามเซิร์ฟเวอร์ใหม่ทุกครั้งที่เปิดหน้านี้
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-header("Expires: 0");
-?>
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Modern & Playful</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Login - Stroke Care Registry</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        :root {
+            --primary-color: #1a237e; /* Deep Navy - Medical Theme */
+            --accent-color: #d32f2f;  /* Alert Red */
+            --text-color: #263238;
+            --font-family: 'Sarabun', sans-serif;
+        }
 
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, #1a237e 0%, #0d1546 100%); /* พื้นหลังไล่สีน้ำเงินเข้ม */
             height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #A8B2FF, #F3C9FF);
-            /* Gradient background */
-            background-size: 200% 200%;
-            animation: gradientAnimation 15s ease infinite;
-            overflow: hidden; /* Prevent scroll if there are minor overflows */
-            color: #333;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
         }
 
-        @keyframes gradientAnimation {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
+        /* Decoration Circles (ฉากหลังจางๆ เพื่อมิติ) */
+        .circle-bg {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            z-index: 0;
         }
+        .circle-1 { width: 400px; height: 400px; top: -100px; left: -100px; }
+        .circle-2 { width: 300px; height: 300px; bottom: -50px; right: -50px; }
 
         .login-wrapper {
-            position: relative;
             width: 100%;
             max-width: 450px;
-            margin: auto;
-        }
-
-        .card {
-            background-color: rgba(255, 255, 255, 0.95); /* Slightly transparent white */
-            border-radius: 1.5rem; /* More rounded corners */
-            backdrop-filter: blur(10px); /* Frosted glass effect */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1); /* Deeper shadow */
+            padding: 20px;
             position: relative;
-            z-index: 2;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .card:hover {
-            transform: translateY(-5px); /* Lift card on hover */
-        }
-
-        .card-illustration {
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 1.5rem;
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            right: 15px;
-            bottom: 15px;
             z-index: 1;
-            transform: rotate(-3deg); /* Stacked effect */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-        }
-        .card-illustration-2 {
-            background-color: rgba(255, 255, 255, 0.7);
-            border-radius: 1.5rem;
-            position: absolute;
-            top: 30px;
-            left: 30px;
-            right: 30px;
-            bottom: 30px;
-            z-index: 0;
-            transform: rotate(3deg); /* Stacked effect */
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.06);
         }
 
+        /* Card Style */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+
+        .card-header-custom {
+            background: white;
+            padding: 40px 30px 10px 30px;
+            text-align: center;
+        }
+
+        .logo-icon {
+            font-size: 3.5rem;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        .app-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .app-subtitle {
+            color: #78909c;
+            font-size: 0.95rem;
+            font-weight: 400;
+        }
 
         .card-body {
-            padding: 3rem; /* More padding */
+            padding: 30px 40px 40px 40px;
         }
 
-        h1 {
-            font-weight: 700;
-            color: #333;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        h1 i {
-            margin-right: 10px;
-            color: #FF7582; /* Icon color from gradient */
-        }
-
+        /* Form Controls */
         .form-label {
             font-weight: 600;
-            color: #555;
-            margin-bottom: 0.5rem;
+            color: #455a64;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
         }
 
         .form-control {
-            border: 1px solid #ddd;
-            border-radius: 0.75rem; /* More rounded input */
-            padding: 0.75rem 1.25rem;
-            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #cfd8dc;
             font-size: 1rem;
+            transition: all 0.3s;
         }
 
         .form-control:focus {
-            border-color: #6DD5FA;
-            box-shadow: 0 0 0 0.25rem rgba(109, 213, 250, 0.25);
-            background-color: #fcfdff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(26, 35, 126, 0.1);
         }
 
+        .input-group-text {
+            background-color: #f8f9fa;
+            border: 1px solid #cfd8dc;
+            color: #78909c;
+        }
+
+        /* Button */
         .btn-primary {
-            background: linear-gradient(135deg, #A8B2FF, #F3C9FF);
+            background: var(--primary-color); /* Solid Blue */
             border: none;
-            border-radius: 0.75rem;
-            padding: 0.85rem 1.5rem;
-            font-size: 1.1rem;
+            border-radius: 50px;
+            padding: 12px;
+            font-size: 1rem;
             font-weight: 600;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(26, 35, 126, 0.3);
             transition: all 0.3s ease;
-            color: white; /* Ensure text is white */
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
-            filter: brightness(1.1); /* Slightly brighter on hover */
-            background-position: right center; /* Animate gradient */
+            background-color: #283593;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 35, 126, 0.4);
         }
 
         .invalid-feedback {
-            font-size: 0.875em;
+            font-size: 0.85rem;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .card-body {
-                padding: 2rem;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            .form-control {
-                padding: 0.65rem 1rem;
-            }
-            .btn-primary {
-                padding: 0.75rem 1.25rem;
-                font-size: 1rem;
-            }
+        /* Animation */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
+
     </style>
-    <script type="text/javascript">
-        // 1. เมื่อหน้านี้ (login.php) โหลดเสร็จ
-        history.pushState(null, null, location.href);
-
-        // 2. เราจะดักฟัง event เมื่อมีการกดปุ่ม Back (popstate)
-        window.addEventListener('popstate', function(event) {
-            history.pushState(null, null, location.href);
-        });
-
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted) {
-                window.location.reload();
-            }
-        });
-    </script>
 </head>
 
 <body>
+
+    <div class="circle-bg circle-1"></div>
+    <div class="circle-bg circle-2"></div>
+
     <div class="login-wrapper">
-        <div class="card-illustration"></div>
-        <div class="card-illustration-2"></div>
         <div class="card">
+            
+            <div class="card-header-custom">
+                <i class="bi bi-heart-pulse-fill logo-icon"></i>
+                <h2 class="app-title">Stroke Care Registry</h2>
+                <p class="app-subtitle">ระบบทะเบียนผู้ป่วยโรคหลอดเลือดสมอง</p>
+            </div>
+
             <div class="card-body">
-
-                <h1 class="text-center mb-4">
-                    <i class="fas fa-lock"></i> Login
-                </h1>
-
                 <form action="process_login.php" method="post" class="needs-validation" novalidate>
 
                     <div class="mb-3">
-                        <label for="id_card" class="form-label">Username</label>
-                        <input type="text" class="form-control" id="id_card" name="uname" placeholder="กรอกเลขบัตรประชาชน 13 หลัก" required maxlength="13" pattern="[0-9]{13}">
-                        <div class="invalid-feedback">
-                            กรุณากรอกเลขบัตรประชาชน 13 หลักให้ถูกต้อง
+                        <label for="id_card" class="form-label">เลขบัตรประชาชน (Username)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-vcard"></i></span>
+                            <input type="text" class="form-control" id="id_card" name="uname" 
+                                   placeholder="กรอกเลข 13 หลัก" 
+                                   required maxlength="13" pattern="[0-9]{13}">
+                            <div class="invalid-feedback">
+                                กรุณากรอกเลขบัตรประชาชน 13 หลักให้ถูกต้อง
+                            </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label for="password" class="form-label">Password</label>
+                        <label for="password" class="form-label">รหัสผ่าน (Password)</label>
                         <div class="input-group">
-                            <input type="password" class="form-control" id="password" name="psword" placeholder="กรอกรหัสผ่าน" required>
-                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" style="border-top-right-radius: 0.75rem; border-bottom-right-radius: 0.75rem;">
-                                <i class="fas fa-eye"></i>
+                            <span class="input-group-text"><i class="bi bi-key"></i></span>
+                            <input type="password" class="form-control" id="password" name="psword" 
+                                   placeholder="กรอกรหัสผ่าน" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword" 
+                                    style="border-color: #cfd8dc;">
+                                <i class="bi bi-eye"></i>
                             </button>
                             <div class="invalid-feedback">
                                 กรุณากรอกรหัสผ่าน
@@ -234,23 +198,29 @@ header("Expires: 0");
 
                     <div class="d-grid mt-4">
                         <button type="submit" class="btn btn-primary">
-                            Sign In
+                            เข้าสู่ระบบ (Sign In)
                         </button>
                     </div>
+
                 </form>
+            </div>
+            
+            <div class="text-center pb-4 text-muted small" style="opacity: 0.6;">
+                &copy; <?php echo date("Y"); ?> Hospital System. All rights reserved.
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
-        // Bootstrap form validation
-        (function() {
+        // Form Validation Loop
+        (function () {
             'use strict'
             var forms = document.querySelectorAll('.needs-validation')
             Array.prototype.slice.call(forms)
-                .forEach(function(form) {
-                    form.addEventListener('submit', function(event) {
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
                         if (!form.checkValidity()) {
                             event.preventDefault()
                             event.stopPropagation()
@@ -265,16 +235,21 @@ header("Expires: 0");
         const password = document.querySelector('#password');
 
         if (togglePassword && password) {
-            togglePassword.addEventListener('click', function(e) {
-                // toggle the type attribute
+            togglePassword.addEventListener('click', function (e) {
                 const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
                 password.setAttribute('type', type);
-                // toggle the eye / eye-slash icon
-                this.querySelector('i').classList.toggle('fa-eye');
-                this.querySelector('i').classList.toggle('fa-eye-slash');
+                
+                const icon = this.querySelector('i');
+                icon.classList.toggle('bi-eye');
+                icon.classList.toggle('bi-eye-slash');
             });
         }
+
+        // Prevent Back Button
+        history.pushState(null, null, location.href);
+        window.addEventListener('popstate', function(event) {
+            history.pushState(null, null, location.href);
+        });
     </script>
 </body>
-
 </html>

@@ -9,7 +9,9 @@ $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
 $action = $_POST['action'] ?? '';
 $admission_id = $_POST['admission_id'] ?? '';
 
-if (empty($admission_id)) {
+// --- แก้ไข: เช็ค admission_id เฉพาะเคสที่จำเป็นต้องใช้ (auto_create, get_list) ---
+// ส่วน update_item หรือ update_date ให้ผ่านไปได้เลย เพราะใช้ id ของตัวเอง
+if (($action == 'auto_create' || $action == 'get_list') && empty($admission_id)) {
     echo json_encode(['status' => 'error', 'message' => 'Missing Admission ID']);
     exit;
 }
@@ -60,6 +62,33 @@ else if ($action === 'update_item') {
         echo json_encode(['status' => 'success']);
     } else {
         echo json_encode(['status' => 'error', 'message' => $stmt->error]);
+    }
+}
+
+// --- CASE 4: อัปเดตเฉพาะวันที่นัด (UPDATE DATE) ---
+else if ($action === 'update_date') {
+    $followup_id = $_POST['followup_id'] ?? '';
+    $new_date = $_POST['new_date'] ?? '';
+
+    if (empty($followup_id) || empty($new_date)) {
+        echo json_encode(['status' => 'error', 'message' => 'ข้อมูลไม่ครบถ้วน']);
+        exit;
+    }
+
+    // อัปเดตวันที่ + คนที่แก้ไขล่าสุด
+    $sql = "UPDATE tbl_followup 
+            SET scheduled_date = ?, 
+                updated_by = ?, 
+                updated_at = NOW() 
+            WHERE id = ?";
+            
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssi", $new_date, $current_user, $followup_id);
+
+    if ($stmt->execute()) {
+        echo json_encode(['status' => 'success', 'message' => 'บันทึกวันที่เรียบร้อย']);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $stmt->error]);
     }
 }
 
