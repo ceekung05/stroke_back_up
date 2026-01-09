@@ -414,8 +414,8 @@ function dt($field, $type)
                                 <input type="date" class="form-control" id="arrivalTime" name="arrivalTime" value="<?= dt('transfer_departure_datetime', 'd') ?>">
                             </div>
                             <div class="col-md-3">
-                                <label for="arrivalTime_time" class="form-label">เวลาที่รถออก (Time)</label>
-                                <input type="time" class="form-control" id="arrivalTime_time" name="arrivalTime_time" value="<?= dt('transfer_departure_datetime', 't') ?>">
+                                <label for="refer_departure_time" class="form-label">เวลาที่รถออก (Time)</label>
+                                <input type="time" class="form-control" id="refer_departure_time" name="refer_departure_time" value="<?= dt('transfer_departure_datetime', 't') ?>">
                             </div>
                             <div class="col-md-3">
                                 <label for="refer_arrival_date" class="form-label ">วันที่ที่ผป.มาถึง</label>
@@ -599,17 +599,17 @@ function dt($field, $type)
                 </div>
                 <div class="p-3 mb-3 bg-white rounded border border-danger border-opacity-25 shadow-sm">
                     <div class="col-md-5 ">
-                    <div class="mb-2">
+                        <div class="mb-2">
                             <label class="form-label small text-muted mb-0">เวลาที่เริ่มมีอาการ (Onset)</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" name="onsetTime_onset_date" value="<?= dt('onset_datetime', 'd') ?>">
                                 <input type="time" class="form-control" name="onsetTime_onset_time" value="<?= dt('onset_datetime', 't') ?>">
                             </div>
+                        </div>
                     </div>
                 </div>
-                </div>
-                
-                
+
+
                 <div class="p-3 mb-4 bg-white rounded border border-danger border-opacity-25 shadow-sm">
                     <p class="fs-5 fw-bold text-danger mb-2">ผู้ป่วยเข้าเกณฑ์ Stroke Fast Track หรือไม่?</p>
                     <div class="d-flex align-items-center gap-3">
@@ -683,8 +683,8 @@ function dt($field, $type)
 
                     <div class="col-md-5 border-start">
                         <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-clock-history"></i> เวลา (Time)</h6>
-                        
-                        
+
+
                         <div class="mb-2">
                             <label class="form-label small text-muted mb-0">เวลาที่ถึง รพ.หาดใหญ่ (Arrival)</label>
                             <div class="input-group input-group-sm">
@@ -705,9 +705,9 @@ function dt($field, $type)
                         <label class="form-label fw-bold">1. Onset to Hospital Level รพช. (นาที)</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white"><i class="bi bi-calculator"></i></span>
-                            <input type="number" class="form-control fw-bold text-primary" 
-                                   id="calc_onset_to_refer" name="time_onset_to_refer_min" 
-                                   readonly placeholder="คำนวณอัตโนมัติ...">
+                            <input type="number" class="form-control fw-bold text-primary"
+                                id="calc_onset_to_refer" name="time_onset_to_refer_min"
+                                readonly placeholder="คำนวณอัตโนมัติ...">
                             <span class="input-group-text">นาที</span>
                         </div>
                         <div class="form-text text-muted small">
@@ -719,14 +719,42 @@ function dt($field, $type)
                         <label class="form-label fw-bold">2. Onset to Hospital Level รพ.หาดใหญ่ (นาที)</label>
                         <div class="input-group">
                             <span class="input-group-text bg-white"><i class="bi bi-calculator"></i></span>
-                            <input type="number" class="form-control fw-bold text-danger" 
-                                   id="calc_onset_to_hatyai" name="time_onset_to_hatyai_min" 
-                                   readonly placeholder="คำนวณอัตโนมัติ...">
+                            <input type="number" class="form-control fw-bold text-danger"
+                                id="calc_onset_to_hatyai" name="time_onset_to_hatyai_min"
+                                readonly placeholder="คำนวณอัตโนมัติ...">
                             <span class="input-group-text">นาที</span>
                         </div>
                         <div class="form-text text-muted small">
                             (เวลาที่ถึง รพ.หาดใหญ่ - เวลาที่เริ่มมีอาการ)
                             <span id="calc_arrival_type_badge" class="badge bg-secondary ms-1"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12" id="calc_refer_details" style="display: none;">
+                    <div class="p-3 bg-white border rounded">
+                        <h6 class="text-primary fw-bold"><i class="bi bi-ambulance"></i> (2) Time to Refer Details</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">ระยะเวลาที่อยู่ รพช. (นาที)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-hourglass-split"></i></span>
+                                    <input type="number" class="form-control fw-bold text-primary"
+                                        id="calc_refer_stay" name="time_refer_hospital_min" readonly placeholder="...">
+                                    <span class="input-group-text">นาที</span>
+                                </div>
+                                <div class="form-text small">(เวลารถออก - เวลาถึง รพช.)</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">ระยะเวลาเดินทาง (นาที)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-speedometer"></i></span>
+                                    <input type="number" class="form-control fw-bold text-primary"
+                                        id="calc_refer_travel" name="time_refer_travel_min" readonly placeholder="...">
+                                    <span class="input-group-text">นาที</span>
+                                </div>
+                                <div class="form-text small">(เวลาถึง รพ.หาดใหญ่ - เวลารถออก)</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -991,36 +1019,45 @@ function dt($field, $type)
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // --- TIME CALCULATION LOGIC (UPDATED FOR EMS) ---
+            // --- TIME CALCULATION LOGIC (UPDATED V3) ---
 
-            // 1. Onset (เวลาเริ่มมีอาการ)
+            // 1. Onset
             const onsetDate = document.querySelector('input[name="onsetTime_onset_date"]');
             const onsetTime = document.querySelector('input[name="onsetTime_onset_time"]');
 
-            // 2. Refer Arrival (เวลาถึง รพ.ชุมชน - Part 5)
-            const referDate = document.querySelector('input[name="refer_arrival_date"]');
-            const referTime = document.querySelector('input[name="refer_arrival_time"]');
+            // 2. Refer Arrival (ถึง รพ.ชุมชน)
+            const referArrDate = document.querySelector('input[name="refer_arrival_date"]');
+            const referArrTime = document.querySelector('input[name="refer_arrival_time"]');
 
-            // 3. EMS Contact (เวลาเจ้าหน้าที่ไปถึงตัวผู้ป่วย - Part 5)
+            // 3. Refer Departure (รถออกจาก รพ.ชุมชน) ** ตัวแปรที่เปลี่ยนชื่อใหม่ **
+            const referDepDate = document.querySelector('input[name="arrivalTime"]');
+            const referDepTime = document.querySelector('input[name="refer_departure_time"]');
+
+            // 4. EMS Contact
             const emsDate = document.querySelector('input[name="first_medical_contact_date"]');
             const emsTime = document.querySelector('input[name="first_medical_contact_time"]');
 
-            // 4. Walk-in Arrival (เวลาถึง ER - Part 5)
+            // 5. Walk-in Arrival (ถึง ER)
             const walkinDate = document.querySelector('input[name="er_arrival_date"]');
             const walkinTime = document.querySelector('input[name="er_arrival_time"]');
 
-            // 5. Hatyai Arrival (เวลาถึง รพ.หาดใหญ่ - Part 8)
+            // 6. Hatyai Arrival (ถึง รพ.หาดใหญ่)
             const hatyaiDate = document.querySelector('input[name="arrivalTime_date"]');
             const hatyaiTime = document.querySelector('input[name="arrivalTime_time"]');
 
             // Radio Arrival Type
             const arrivalRadios = document.querySelectorAll('input[name="arrival_type"]');
-            
-            // Output Fields
+
+            // Output Fields (เดิม)
             const outRefer = document.getElementById('calc_onset_to_refer');
             const outHatyai = document.getElementById('calc_onset_to_hatyai');
             const sectionRefer = document.getElementById('calc_refer_section');
             const badgeType = document.getElementById('calc_arrival_type_badge');
+
+            // Output Fields (ใหม่ - Time to Refer)
+            const sectionReferDetails = document.getElementById('calc_refer_details');
+            const outReferStay = document.getElementById('calc_refer_stay');
+            const outReferTravel = document.getElementById('calc_refer_travel');
 
             // ฟังก์ชันคำนวณความต่างเวลา (นาที)
             function calculateDiffMinutes(d1, t1, d2, t2) {
@@ -1028,10 +1065,9 @@ function dt($field, $type)
                 const start = new Date(`${d1}T${t1}`);
                 const end = new Date(`${d2}T${t2}`);
                 const diffMs = end - start;
-                return Math.floor(diffMs / 60000); // แปลงเป็นนาที
+                return Math.floor(diffMs / 60000);
             }
 
-            // ฟังก์ชัน Sync เวลาจาก Walk-in Part 5 -> Part 8
             function syncWalkInToHatyai() {
                 const currentType = document.querySelector('input[name="arrival_type"]:checked')?.value;
                 if (currentType === 'walk_in') {
@@ -1044,72 +1080,66 @@ function dt($field, $type)
                 const currentType = document.querySelector('input[name="arrival_type"]:checked')?.value || '';
                 const isRefer = (currentType === 'refer');
 
-                // --- 1. จัดการการแสดงผล ---
+                // --- 1. การแสดงผล ---
                 if (sectionRefer) sectionRefer.style.display = isRefer ? 'block' : 'none';
-                
-                if(currentType === 'ems') badgeType.textContent = 'EMS (First Contact)';
-                else if(currentType === 'walk_in') badgeType.textContent = 'Walk-in';
-                else if(currentType === 'refer') badgeType.textContent = 'Refer';
+                if (sectionReferDetails) sectionReferDetails.style.display = isRefer ? 'block' : 'none'; // โชว์ส่วนใหม่
+
+                if (currentType === 'ems') badgeType.textContent = 'EMS';
+                else if (currentType === 'walk_in') badgeType.textContent = 'Walk-in';
+                else if (currentType === 'refer') badgeType.textContent = 'Refer';
                 else badgeType.textContent = '';
 
-                // --- 2. Logic การคำนวณ ---
-                
-                // A. คำนวณ Onset -> Refer Hospital (เฉพาะ Refer)
+                // --- 2. คำนวณ ---
+
+                // A. Onset -> Refer Hospital
                 if (isRefer) {
-                    const minsRefer = calculateDiffMinutes(onsetDate.value, onsetTime.value, referDate.value, referTime.value);
+                    const minsRefer = calculateDiffMinutes(onsetDate.value, onsetTime.value, referArrDate.value, referArrTime.value);
                     outRefer.value = (minsRefer !== '' && !isNaN(minsRefer)) ? minsRefer : '';
+
+                    // ** สูตรใหม่ 1: เวลาอยู่ รพช. = (รถออก - ถึง รพช.) **
+                    const minsStay = calculateDiffMinutes(referArrDate.value, referArrTime.value, referDepDate.value, referDepTime.value);
+                    outReferStay.value = (minsStay !== '' && !isNaN(minsStay)) ? minsStay : '';
+
+                    // ** สูตรใหม่ 2: เวลาเดินทาง = (ถึงหาดใหญ่ - รถออก) **
+                    const minsTravel = calculateDiffMinutes(referDepDate.value, referDepTime.value, hatyaiDate.value, hatyaiTime.value);
+                    outReferTravel.value = (minsTravel !== '' && !isNaN(minsTravel)) ? minsTravel : '';
+
                 } else {
-                    outRefer.value = ''; 
+                    outRefer.value = '';
+                    outReferStay.value = '';
+                    outReferTravel.value = '';
                 }
 
-                // B. คำนวณ Onset -> Hatyai Hospital (แยกเคส)
+                // B. Onset -> Hatyai Hospital
                 let minsHatyai = '';
-
                 if (currentType === 'ems') {
-                    // *** แก้ไขตามที่ขอ: ใช้เวลา EMS Header (Part 5) ลบ Onset ***
                     minsHatyai = calculateDiffMinutes(onsetDate.value, onsetTime.value, emsDate.value, emsTime.value);
-
                 } else if (currentType === 'walk_in') {
-                    // Walk-in: Sync ไป Part 8 ก่อน แล้วคำนวณ
                     syncWalkInToHatyai();
                     minsHatyai = calculateDiffMinutes(onsetDate.value, onsetTime.value, hatyaiDate.value, hatyaiTime.value);
-                
                 } else {
-                    // กรณี Refer หรืออื่นๆ: ใช้เวลาถึง รพ.หาดใหญ่ (Part 8) ปกติ
                     minsHatyai = calculateDiffMinutes(onsetDate.value, onsetTime.value, hatyaiDate.value, hatyaiTime.value);
                 }
-
                 outHatyai.value = (minsHatyai !== '' && !isNaN(minsHatyai)) ? minsHatyai : '';
             }
 
             // --- Event Listeners ---
+            const inputs = [
+                onsetDate, onsetTime,
+                referArrDate, referArrTime, referDepDate, referDepTime,
+                emsDate, emsTime,
+                walkinDate, walkinTime,
+                hatyaiDate, hatyaiTime
+            ];
 
-            // Onset
-            if(onsetDate) onsetDate.addEventListener('change', updateCalculations);
-            if(onsetTime) onsetTime.addEventListener('change', updateCalculations);
+            inputs.forEach(el => {
+                if (el) el.addEventListener('change', updateCalculations);
+            });
 
-            // Refer
-            if(referDate) referDate.addEventListener('change', updateCalculations);
-            if(referTime) referTime.addEventListener('change', updateCalculations);
-
-            // EMS (เพิ่มใหม่)
-            if(emsDate) emsDate.addEventListener('change', updateCalculations);
-            if(emsTime) emsTime.addEventListener('change', updateCalculations);
-
-            // Walk-in
-            if(walkinDate) walkinDate.addEventListener('change', updateCalculations);
-            if(walkinTime) walkinTime.addEventListener('change', updateCalculations);
-
-            // Hatyai Arrival
-            if(hatyaiDate) hatyaiDate.addEventListener('change', updateCalculations);
-            if(hatyaiTime) hatyaiTime.addEventListener('change', updateCalculations);
-
-            // Radio Buttons
             arrivalRadios.forEach(radio => {
                 radio.addEventListener('change', updateCalculations);
             });
 
-            // Run on load
             updateCalculations();
         });
     </script>
