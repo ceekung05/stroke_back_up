@@ -1,16 +1,18 @@
 <?php
 session_start();
-require_once 'connectdb.php'; 
+require_once 'connectdb.php';
 
 // ฟังก์ชันรวม Date + Time
-function combineDateTime($date, $time) {
+function combineDateTime($date, $time)
+{
     if (empty($date)) return null;
     if (empty($time)) return $date . ' 00:00:00';
     return $date . ' ' . $time;
 }
 
 // ฟังก์ชันแปลง Checkbox
-function checkVal($field_name) {
+function checkVal($field_name)
+{
     return isset($_POST[$field_name]) ? 1 : 0;
 }
 
@@ -42,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mt_med_integrilin = checkVal('mt_med_integrilin');
         $mt_integrilin_bolus = $_POST['mt_integrilin_bolus'] ?? null;
         $mt_integrilin_drip = $_POST['mt_integrilin_drip'] ?? null;
-        
+
         $mt_med_nimodipine = checkVal('mt_med_nimodipine');
         $mt_nimodipine_bolus = $_POST['mt_nimodipine_bolus'] ?? null;
         $mt_nimodipine_drip = $_POST['mt_nimodipine_drip'] ?? null;
@@ -55,14 +57,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // B. Hemo Values
         $hemo_location = $_POST['hemo_location'] ?? null;
         $hemo_volume_cc = $_POST['hemo_volume_cc'] ?? null;
-        
+
         $hemo_proc_craniotomy = checkVal('hemo_proc_craniotomy');
         $hemo_proc_craniectomy = checkVal('hemo_proc_craniectomy');
         $hemo_proc_ventriculostomy = checkVal('hemo_proc_ventriculostomy');
 
         // Common
         $complication_details = $_POST['complication_details'] ?? null;
-        $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
+        // แก้ไข: รับชื่อผู้ใช้ให้ชัวร์
+        $sess_user = $_SESSION['user_data'] ?? [];
+        $current_user = $sess_user['HR_FNAME'] ?? $sess_user['hr_fname'] ?? 'System';
 
         $sql = "INSERT INTO tbl_or_procedure (
                     admission_id, procedure_type,
@@ -121,32 +125,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // *** ตรวจสอบจำนวนตัวแปรให้ตรงกับเครื่องหมาย ? ใน SQL (27 ตัว) ***
         // i=1, s=1, sss=3, ssss=4, idd=3, idd=3, ddis=4, sd=2, iii=3, s=1, s=1, s=1 
         // รวมทั้งหมด 27 ตัว ถูกต้อง
-        $stmt->bind_param("issssssssiddiddddissiiissss", 
-            $admission_id, 
+        $stmt->bind_param(
+            "issssssssiddiddddissiiissss",
+            $admission_id,
             $procedure_type,
-            $mt_anesthesia_datetime, 
-            $mt_puncture_datetime, 
+            $mt_anesthesia_datetime,
+            $mt_puncture_datetime,
             $mt_recanalization_datetime,
-            $mt_occlusion_vessel, 
-            $mt_tici_score, 
-            $mt_procedure_technique, 
+            $mt_occlusion_vessel,
+            $mt_tici_score,
+            $mt_procedure_technique,
             $mt_pass_count,
-            $mt_med_integrilin, 
-            $mt_integrilin_bolus, 
+            $mt_med_integrilin,
+            $mt_integrilin_bolus,
             $mt_integrilin_drip,
-            $mt_med_nimodipine, 
-            $mt_nimodipine_bolus, 
+            $mt_med_nimodipine,
+            $mt_nimodipine_bolus,
             $mt_nimodipine_drip,
-            $mt_xray_dose, 
-            $mt_flu_time, 
-            $mt_cone_beam_ct, 
+            $mt_xray_dose,
+            $mt_flu_time,
+            $mt_cone_beam_ct,
             $mt_cone_beam_ct_details,
-            $hemo_location, 
+            $hemo_location,
             $hemo_volume_cc,
-            $hemo_proc_craniotomy, 
-            $hemo_proc_craniectomy, 
+            $hemo_proc_craniotomy,
+            $hemo_proc_craniectomy,
             $hemo_proc_ventriculostomy,
-            $complication_details, 
+            $complication_details,
             $current_user, // created_by
             $current_user  // updated_by
         );
@@ -160,10 +165,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             throw new Exception($stmt->error);
         }
-
     } catch (Exception $e) {
         http_response_code(500);
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
 }
-?>

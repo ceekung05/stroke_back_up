@@ -57,6 +57,9 @@ function dt($field, $type) {
             <i class="bi bi-heart-pulse-fill"></i>
             <span>Stroke Care</span>
         </div>
+        <hr class="sidebar-divider"><a href="dashboard.php" >
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
         <a href="index.php">
             <i class="bi bi-list-task"></i> กลับไปหน้า Patient List
         </a>
@@ -97,29 +100,7 @@ function dt($field, $type) {
         <form id="erForm" onsubmit="return false;">
             <input type="hidden" name="admission_id" value="<?= $admission_id ?>">
             
-            <div class="card-form">
-                <div class="section-title" style="margin-top:0;">
-                    <i class="bi bi-ambulance"></i> 1. เวลาในการส่งต่อ (Transfer Timeline)
-                </div>
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label for="arrivalTime" class="form-label">วันที่ส่งต่อ (Departure Date)</label>
-                        <input type="date" class="form-control" id="arrivalTime" name="arrivalTime" value="<?= dt('transfer_departure_datetime', 'd') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="arrivalTime_time" class="form-label">เวลาที่รถออก (Time)</label>
-                        <input type="time" class="form-control" id="arrivalTime_time" name="arrivalTime_time" value="<?= dt('transfer_departure_datetime', 't') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="arrivalTime_datetime" class="form-label">วันที่ถึง รพ. ปลายทาง (Arrival Date)</label>
-                        <input type="date" class="form-control" id="arrivalTime_datetime" name="arrivalTime_datetime" value="<?= dt('transfer_arrival_datetime', 'd') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="arrivalTime_time_destination" class="form-label">เวลาถึง รพ. (Time)</label>
-                        <input type="time" class="form-control" id="arrivalTime_time_destination" name="arrivalTime_time_destination" value="<?= dt('transfer_arrival_datetime', 't') ?>">
-                    </div>
-                </div>
-            </div>
+            
 
             <div class="card-form">
                 <div class="section-title" style="margin-top:0;">

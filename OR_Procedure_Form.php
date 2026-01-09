@@ -70,6 +70,9 @@ function dt($field, $type)
             <i class="bi bi-heart-pulse-fill"></i>
             <span>Stroke Care</span>
         </div>
+        <hr class="sidebar-divider"><a href="dashboard.php" >
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
         <a href="index.php">
             <i class="bi bi-list-task"></i> กลับไปหน้า Patient List
         </a>
@@ -170,10 +173,23 @@ function dt($field, $type)
                             <label for="occlusionvessel" class="form-label fw-bold text-muted">Occlusion Vessel</label>
                             <select class="form-select" id="occlusionvessel" name="mt_occlusion_vessel">
                                 <option value="" disabled <?= sel('mt_occlusion_vessel', '') ?>>-- เลือกตำแหน่ง --</option>
-                                <option value="Left ICA" <?= sel('mt_occlusion_vessel', 'Left ICA') ?>>Cervical ICA left</option>
-                                <option value="Right ICA" <?= sel('mt_occlusion_vessel', 'Right ICA') ?>>Cervical ICA Right</option>
-                                <option value="Left M1 of MCA" <?= sel('mt_occlusion_vessel', 'Left M1 of MCA') ?>>Left M1 of MCA</option>
-                                <option value="Right M1 of MCA" <?= sel('mt_occlusion_vessel', 'Right M1 of MCA') ?>>Right M1 of MCA</option>
+                                <option value="Left ICA" <?= sel('occlusion_site', 'Left ICA') ?>>Cervical ICA left</option>
+                            <option value="Right ICA" <?= sel('occlusion_site', 'Right ICA') ?>>Cervical ICA Right</option>
+                            <option value="Intracranial left ICA" <?= sel('occlusion_site', 'Intracranial left ICA') ?>>Intracranial ICA left</option>
+                            <option value="Intracranial Right ICA" <?= sel('occlusion_site', 'Intracranial Right ICA') ?>>Intracranial ICA Right</option>
+                            <option value="Left M1 of MCA" <?= sel('occlusion_site', 'Left M1 of MCA') ?>>Left M1 of MCA</option>
+                            <option value="Right M1 of MCA" <?= sel('occlusion_site', 'Right M1 of MCA') ?>>Right M1 of MCA</option>
+                            <option value="Left M2 of MCA" <?= sel('occlusion_site', 'Left M2 of MCA') ?>>Left M2 of MCA</option>
+                            <option value="Right M2 of MCA" <?= sel('occlusion_site', 'Right M2 of MCA') ?>>Right M2 of MCA</option>
+                            <option value="Left Beyond M2 of MCA" <?= sel('occlusion_site', 'Left Beyond M2 of MCA') ?>>Left Beyond M2 of MCA</option>
+                            <option value="Right Beyond M2 of MCA" <?= sel('occlusion_site', 'Right Beyond M2 of MCA') ?>>Right Beyond M2 of MCA</option>
+                            <option value="Left ACA" <?= sel('occlusion_site', 'Left ACA') ?>>Left ACA</option>
+                            <option value="Right ACA" <?= sel('occlusion_site', 'Right ACA') ?>>Right ACA</option>
+                            <option value="Left PCA" <?= sel('occlusion_site', 'Left PCA') ?>>Left PCA</option>
+                            <option value="Right PCA" <?= sel('occlusion_site', 'Right PCA') ?>>Right PCA</option>
+                            <option value="left Vertebral artery" <?= sel('occlusion_site', 'left Vertebral artery') ?>>left Vertebral artery</option>
+                            <option value="Right Vertebral artery" <?= sel('occlusion_site', 'Right Vertebral artery') ?>>Right Vertebral artery</option>
+                            <option value="Basilar" <?= sel('occlusion_site', 'Basilar') ?>>Basilar</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">

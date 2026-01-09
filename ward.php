@@ -70,6 +70,9 @@ function dt($field, $type) {
             <i class="bi bi-heart-pulse-fill"></i>
             <span>Stroke Care</span>
         </div>
+        <hr class="sidebar-divider"><a href="dashboard.php" >
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
         <a href="index.php">
             <i class="bi bi-list-task"></i> กลับไปหน้า Patient List
         </a>

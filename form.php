@@ -86,13 +86,16 @@ function dt($field, $type)
             <i class="bi bi-heart-pulse-fill"></i>
             <span>Stroke Care</span>
         </div>
-
+        <hr class="sidebar-divider">
+        <a href="dashboard.php">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
         <a href="index.php">
             <i class="bi bi-list-task"></i> กลับไปหน้า Patient List
         </a>
         <hr class="sidebar-divider">
 
-        <a href="form.php<?= $admission_id ? '?admission_id=' . $admission_id : 'form.php' ?>" class="active">
+        <a href="form.php<?= $admission_id ? '?admission_id=' . $admission_id : '' ?>" class="active">
             <i class="bi bi-person-lines-fill"></i> 1. ข้อมูลทั่วไป
         </a>
         <a href="<?= $admission_id ? 'diagnosis_form.php?admission_id=' . $admission_id : 'diagnosis_form.php' ?>" class="<?= !$admission_id ? 'disabled-link' : '' ?>">
@@ -170,11 +173,11 @@ function dt($field, $type)
                         <label class="form-label">ที่อยู่</label>
                         <input type="text" class="form-control" id="display_address" name="address_full" value="<?= val('address_full') ?>" placeholder="...">
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-5 mb-3">
                         <label class="form-label">กรุ๊ปเลือด</label>
                         <input type="text" class="form-control" id="display_blood_type" name="blood_type" value="<?= val('blood_type') ?>" placeholder="...">
                     </div>
-                    <div class="col-md-2 mb-3">
+                    <div class="col-md-4 mb-3">
                         <label class="form-label">อายุ</label>
                         <input type="text" class="form-control" id="display_age" name="age" value="<?= val('age') ?>" placeholder="...">
                     </div>
@@ -182,7 +185,10 @@ function dt($field, $type)
                         <label class="form-label">เพศ</label>
                         <input type="text" class="form-control" id="display_sex" name="gender" value="<?= val('gender') ?>" placeholder="...">
                     </div>
-
+                    <div class="col-md-2 mb-3">
+                        <label class="form-label">เบอร์โทรศัพท์</label>
+                        <input type="text" class="form-control" id="phone_number" name="phone_number" value="<?= val('phone_number') ?>" placeholder="...">
+                    </div>
                     <div class="col-12">
                         <hr class="text-muted opacity-25">
                     </div>
@@ -267,6 +273,22 @@ function dt($field, $type)
                             <input class="form-check-input" type="checkbox" name="comorbid_smoking" value="1" id="comorbid_smoking" <?= chk('addict_smoking') ?>>
                             <label class="form-check-label" for="comorbid_smoking">SMOKING</label>
                         </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="comorbid_kratom" value="1" id="comorbid_kratom" <?= chk('addict_kratom') ?>>
+                            <label class="form-check-label" for="comorbid_kratom">กระท่อม</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="comorbid_cannabis" value="1" id="comorbid_cannabis" <?= chk('addict_cannabis') ?>>
+                            <label class="form-check-label" for="comorbid_cannabis">กัญชา</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="comorbid_crystal_meth" value="1" id="comorbid_crystal_meth" <?= chk('addict_crystal_meth') ?>>
+                            <label class="form-check-label" for="comorbid_crystal_meth">ไอซ์</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" name="comorbid_yaba" value="1" id="comorbid_yaba" <?= chk('addict_yaba') ?>>
+                            <label class="form-check-label" for="comorbid_yaba">ยาบ้า</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -301,7 +323,99 @@ function dt($field, $type)
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="refer_from_text" class="form-label">Refer จาก (ระบุโรงพยาบาล):</label>
-                                <input type="text" class="form-control" name="refer_from_text" id="refer_from_text" placeholder="ระบุชื่อโรงพยาบาล..." value="<?= val('refer_from_hospital') ?>">
+                                <select name="refer_from_text" type="text" class="form-select" id="refer_from_text">
+                                    <option value="">-- เลือกโรงพยาบาลต้นทาง --</option>
+
+                                    <optgroup label="ระดับ A/S (โรงพยาบาลศูนย์/ทั่วไป)">
+                                        <option value="รพศ.หาดใหญ่" <?= sel('refer_from_hospital', 'รพศ.หาดใหญ่') ?>>รพศ.หาดใหญ่ (สงขลา)</option>
+                                        <option value="รพศ.ตรัง" <?= sel('refer_from_hospital', 'รพศ.ตรัง') ?>>รพศ.ตรัง (ตรัง)</option>
+                                        <option value="รพท.พัทลุง" <?= sel('refer_from_hospital', 'รพท.พัทลุง') ?>>รพท.พัทลุง (พัทลุง)</option>
+                                        <option value="รพท.สงขลา" <?= sel('refer_from_hospital', 'รพท.สงขลา') ?>>รพท.สงขลา (สงขลา)</option>
+                                        <option value="รพท.ปัตตานี" <?= sel('refer_from_hospital', 'รพท.ปัตตานี') ?>>รพท.ปัตตานี (ปัตตานี)</option>
+                                        <option value="รพศ.ยะลา" <?= sel('refer_from_hospital', 'รพศ.ยะลา') ?>>รพศ.ยะลา (ยะลา)</option>
+                                        <option value="รพศ.นราธิวาสราชนครินทร์" <?= sel('refer_from_hospital', 'รพศ.นราธิวาสราชนครินทร์') ?>>รพศ.นราธิวาสราชนครินทร์ (นราธิวาส)</option>
+                                        <option value="รพท.สตูล" <?= sel('refer_from_hospital', 'รพท.สตูล') ?>>รพท.สตูล (สตูล)</option>
+                                        <option value="รพท.สุไหงโก-ลก" <?= sel('refer_from_hospital', 'รพท.สุไหงโก-ลก') ?>>รพท.สุไหงโก-ลก (นราธิวาส)</option>
+                                        <option value="รพท.เบตง" <?= sel('refer_from_hospital', 'รพท.เบตง') ?>>รพท.เบตง (ยะลา)</option>
+                                    </optgroup>
+
+                                    <optgroup label="ระดับ M/F (โรงพยาบาลชุมชน)">
+                                        <option value="รพช.ห้วยยอด" <?= sel('refer_from_hospital', 'รพช.ห้วยยอด') ?>>รพช.ห้วยยอด (ตรัง)</option>
+                                        <option value="รพช.ย่านตาขาว" <?= sel('refer_from_hospital', 'รพช.ย่านตาขาว') ?>>รพช.ย่านตาขาว (ตรัง)</option>
+                                        <option value="รพช.ควนขนุน" <?= sel('refer_from_hospital', 'รพช.ควนขนุน') ?>>รพช.ควนขนุน (พัทลุง)</option>
+                                        <option value="รพช.ละงู" <?= sel('refer_from_hospital', 'รพช.ละงู') ?>>รพช.ละงู (สตูล)</option>
+                                        <option value="รพช.สมเด็จพระบรมราชินีนาถ ณ อ.นาทวี" <?= sel('refer_from_hospital', 'รพช.สมเด็จพระบรมราชินีนาถ ณ อ.นาทวี') ?>>รพช.สมเด็จพระบรมราชินีนาถ ณ อ.นาทวี (สงขลา)</option>
+                                        <option value="รพช.สะเดา" <?= sel('refer_from_hospital', 'รพช.สะเดา') ?>>รพช.สะเดา (สงขลา)</option>
+                                        <option value="รพช.ระโนด" <?= sel('refer_from_hospital', 'รพช.ระโนด') ?>>รพช.ระโนด (สงขลา)</option>
+                                        <option value="รพช.จะนะ" <?= sel('refer_from_hospital', 'รพช.จะนะ') ?>>รพช.จะนะ (สงขลา)</option>
+                                        <option value="รพช.เทพา" <?= sel('refer_from_hospital', 'รพช.เทพา') ?>>รพช.เทพา (สงขลา)</option>
+                                        <option value="รพช.สายบุรี" <?= sel('refer_from_hospital', 'รพช.สายบุรี') ?>>รพช.สายบุรี (ปัตตานี)</option>
+                                        <option value="รพช.โคกโพธิ์" <?= sel('refer_from_hospital', 'รพช.โคกโพธิ์') ?>>รพช.โคกโพธิ์ (ปัตตานี)</option>
+                                        <option value="รพช.ยะหา" <?= sel('refer_from_hospital', 'รพช.ยะหา') ?>>รพช.ยะหา (ยะลา)</option>
+                                        <option value="รพช.รามัน" <?= sel('refer_from_hospital', 'รพช.รามัน') ?>>รพช.รามัน (ยะลา)</option>
+                                        <option value="รพช.ระแงะ" <?= sel('refer_from_hospital', 'รพช.ระแงะ') ?>>รพช.ระแงะ (นราธิวาส)</option>
+                                        <option value="รพช.ตากใบ" <?= sel('refer_from_hospital', 'รพช.ตากใบ') ?>>รพช.ตากใบ (นราธิวาส)</option>
+                                        <option value="รพช.กันตัง" <?= sel('refer_from_hospital', 'รพช.กันตัง') ?>>รพช.กันตัง (ตรัง)</option>
+                                        <option value="รพช.ปะเหลียน" <?= sel('refer_from_hospital', 'รพช.ปะเหลียน') ?>>รพช.ปะเหลียน (ตรัง)</option>
+                                        <option value="รพช.นาโยง" <?= sel('refer_from_hospital', 'รพช.นาโยง') ?>>รพช.นาโยง (ตรัง)</option>
+                                        <option value="รพช.สิเกา" <?= sel('refer_from_hospital', 'รพช.สิเกา') ?>>รพช.สิเกา (ตรัง)</option>
+                                        <option value="รพช.รัษฎา" <?= sel('refer_from_hospital', 'รพช.รัษฎา') ?>>รพช.รัษฎา (ตรัง)</option>
+                                        <option value="รพช.วังวิเศษ" <?= sel('refer_from_hospital', 'รพช.วังวิเศษ') ?>>รพช.วังวิเศษ (ตรัง)</option>
+                                        <option value="รพช.หาดสำราญเฉลิมพระเกียรติ" <?= sel('refer_from_hospital', 'รพช.หาดสำราญเฉลิมพระเกียรติ') ?>>รพช.หาดสำราญเฉลิมพระเกียรติ (ตรัง)</option>
+                                        <option value="รพช.ตะโหมด" <?= sel('refer_from_hospital', 'รพช.ตะโหมด') ?>>รพช.ตะโหมด (พัทลุง)</option>
+                                        <option value="รพช.กงหรา" <?= sel('refer_from_hospital', 'รพช.กงหรา') ?>>รพช.กงหรา (พัทลุง)</option>
+                                        <option value="รพช.เขาชัยสน" <?= sel('refer_from_hospital', 'รพช.เขาชัยสน') ?>>รพช.เขาชัยสน (พัทลุง)</option>
+                                        <option value="รพช.บางแก้ว" <?= sel('refer_from_hospital', 'รพช.บางแก้ว') ?>>รพช.บางแก้ว (พัทลุง)</option>
+                                        <option value="รพช.ปากพะยูน" <?= sel('refer_from_hospital', 'รพช.ปากพะยูน') ?>>รพช.ปากพะยูน (พัทลุง)</option>
+                                        <option value="รพช.ป่าบอน" <?= sel('refer_from_hospital', 'รพช.ป่าบอน') ?>>รพช.ป่าบอน (พัทลุง)</option>
+                                        <option value="รพช.ป่าพะยอม" <?= sel('refer_from_hospital', 'รพช.ป่าพะยอม') ?>>รพช.ป่าพะยอม (พัทลุง)</option>
+                                        <option value="รพช.ศรีบรรพต" <?= sel('refer_from_hospital', 'รพช.ศรีบรรพต') ?>>รพช.ศรีบรรพต (พัทลุง)</option>
+                                        <option value="รพช.ศรีนครินทร์" <?= sel('refer_from_hospital', 'รพช.ศรีนครินทร์') ?>>รพช.ศรีนครินทร์ (พัทลุง)</option>
+                                        <option value="รพช.ควนกาหลง" <?= sel('refer_from_hospital', 'รพช.ควนกาหลง') ?>>รพช.ควนกาหลง (สตูล)</option>
+                                        <option value="รพช.ควนโดน" <?= sel('refer_from_hospital', 'รพช.ควนโดน') ?>>รพช.ควนโดน (สตูล)</option>
+                                        <option value="รพช.ทุ่งหว้า" <?= sel('refer_from_hospital', 'รพช.ทุ่งหว้า') ?>>รพช.ทุ่งหว้า (สตูล)</option>
+                                        <option value="รพช.ท่าแพ" <?= sel('refer_from_hospital', 'รพช.ท่าแพ') ?>>รพช.ท่าแพ (สตูล)</option>
+                                        <option value="รพช.มะนัง" <?= sel('refer_from_hospital', 'รพช.มะนัง') ?>>รพช.มะนัง (สตูล)</option>
+                                        <option value="รพช.สิงหนคร" <?= sel('refer_from_hospital', 'รพช.สิงหนคร') ?>>รพช.สิงหนคร (สงขลา)</option>
+                                        <option value="รพช.สทิงพระ" <?= sel('refer_from_hospital', 'รพช.สทิงพระ') ?>>รพช.สทิงพระ (สงขลา)</option>
+                                        <option value="รพช.สะบ้าย้อย" <?= sel('refer_from_hospital', 'รพช.สะบ้าย้อย') ?>>รพช.สะบ้าย้อย (สงขลา)</option>
+                                        <option value="รพช.คลองหอยโข่ง" <?= sel('refer_from_hospital', 'รพช.คลองหอยโข่ง') ?>>รพช.คลองหอยโข่ง (สงขลา)</option>
+                                        <option value="รพช.ควนเนียง" <?= sel('refer_from_hospital', 'รพช.ควนเนียง') ?>>รพช.ควนเนียง (สงขลา)</option>
+                                        <option value="รพช.นาหม่อม" <?= sel('refer_from_hospital', 'รพช.นาหม่อม') ?>>รพช.นาหม่อม (สงขลา)</option>
+                                        <option value="รพช.บางกล่ำ" <?= sel('refer_from_hospital', 'รพช.บางกล่ำ') ?>>รพช.บางกล่ำ (สงขลา)</option>
+                                        <option value="รพช.รัตภูมิ" <?= sel('refer_from_hospital', 'รพช.รัตภูมิ') ?>>รพช.รัตภูมิ (สงขลา)</option>
+                                        <option value="รพช.ปาดังเบซาร์" <?= sel('refer_from_hospital', 'รพช.ปาดังเบซาร์') ?>>รพช.ปาดังเบซาร์ (สงขลา)</option>
+                                        <option value="รพช.กระแสสินธุ์" <?= sel('refer_from_hospital', 'รพช.กระแสสินธุ์') ?>>รพช.กระแสสินธุ์ (สงขลา)</option>
+                                        <option value="รพช.กะพ้อ" <?= sel('refer_from_hospital', 'รพช.กะพ้อ') ?>>รพช.กะพ้อ (ปัตตานี)</option>
+                                        <option value="รพช.ทุ่งยางแดง" <?= sel('refer_from_hospital', 'รพช.ทุ่งยางแดง') ?>>รพช.ทุ่งยางแดง (ปัตตานี)</option>
+                                        <option value="รพช.แม่ลาน" <?= sel('refer_from_hospital', 'รพช.แม่ลาน') ?>>รพช.แม่ลาน (ปัตตานี)</option>
+                                        <option value="รพช.ไม้แก่น" <?= sel('refer_from_hospital', 'รพช.ไม้แก่น') ?>>รพช.ไม้แก่น (ปัตตานี)</option>
+                                        <option value="รพช.มายอ" <?= sel('refer_from_hospital', 'รพช.มายอ') ?>>รพช.มายอ (ปัตตานี)</option>
+                                        <option value="รพช.ปานาเระ" <?= sel('refer_from_hospital', 'รพช.ปานาเระ') ?>>รพช.ปานาเระ (ปัตตานี)</option>
+                                        <option value="รพช.ยะรัง" <?= sel('refer_from_hospital', 'รพช.ยะรัง') ?>>รพช.ยะรัง (ปัตตานี)</option>
+                                        <option value="รพช.ยะหริ่ง" <?= sel('refer_from_hospital', 'รพช.ยะหริ่ง') ?>>รพช.ยะหริ่ง (ปัตตานี)</option>
+                                        <option value="รพช.หนองจิก" <?= sel('refer_from_hospital', 'รพช.หนองจิก') ?>>รพช.หนองจิก (ปัตตานี)</option>
+                                        <option value="รพช.กาบัง" <?= sel('refer_from_hospital', 'รพช.กาบัง') ?>>รพช.กาบัง (ยะลา)</option>
+                                        <option value="รพช.กรงปินัง" <?= sel('refer_from_hospital', 'รพช.กรงปินัง') ?>>รพช.กรงปินัง (ยะลา)</option>
+                                        <option value="รพช.ธารโต" <?= sel('refer_from_hospital', 'รพช.ธารโต') ?>>รพช.ธารโต (ยะลา)</option>
+                                        <option value="รพช.บันนังสตา" <?= sel('refer_from_hospital', 'รพช.บันนังสตา') ?>>รพช.บันนังสตา (ยะลา)</option>
+                                        <option value="รพช.ยี่งอ" <?= sel('refer_from_hospital', 'รพช.ยี่งอ') ?>>รพช.ยี่งอ (นราธิวาส)</option>
+                                        <option value="รพช.รือเสาะ" <?= sel('refer_from_hospital', 'รพช.รือเสาะ') ?>>รพช.รือเสาะ (นราธิวาส)</option>
+                                        <option value="รพช.จะแนะ" <?= sel('refer_from_hospital', 'รพช.จะแนะ') ?>>รพช.จะแนะ (นราธิวาส)</option>
+                                        <option value="รพช.เจาะไอร้อง" <?= sel('refer_from_hospital', 'รพช.เจาะไอร้อง') ?>>รพช.เจาะไอร้อง (นราธิวาส)</option>
+                                        <option value="รพช.แว้ง" <?= sel('refer_from_hospital', 'รพช.แว้ง') ?>>รพช.แว้ง (นราธิวาส)</option>
+                                        <option value="รพช.สุคิริน" <?= sel('refer_from_hospital', 'รพช.สุคิริน') ?>>รพช.สุคิริน (นราธิวาส)</option>
+                                        <option value="รพช.สุไหงปาดี" <?= sel('refer_from_hospital', 'รพช.สุไหงปาดี') ?>>รพช.สุไหงปาดี (นราธิวาส)</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="arrivalTime" class="form-label">วันที่ส่งต่อ (Departure Date)</label>
+                                <input type="date" class="form-control" id="arrivalTime" name="arrivalTime" value="<?= dt('transfer_departure_datetime', 'd') ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="arrivalTime_time" class="form-label">เวลาที่รถออก (Time)</label>
+                                <input type="time" class="form-control" id="arrivalTime_time" name="arrivalTime_time" value="<?= dt('transfer_departure_datetime', 't') ?>">
                             </div>
                             <div class="col-md-3">
                                 <label for="refer_arrival_date" class="form-label ">วันที่ที่ผป.มาถึง</label>
@@ -435,6 +549,14 @@ function dt($field, $type)
                                             <input class="form-check-input" type="checkbox" value="1" id="med_clopidogrel" name="med_clopidogrel" <?= chk('med_clopidogrel') ?>>
                                             <label class="form-check-label" for="med_clopidogrel">Clopidogrel</label>
                                         </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="1" id="med_cilostazol" name="med_cilostazol" <?= chk('med_cilostazol') ?>>
+                                            <label class="form-check-label" for="med_cilostazol">Cilostazol</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="1" id="med_ticaqrelor" name="med_ticaqrelor" <?= chk('med_ticaqrelor') ?>>
+                                            <label class="form-check-label" for="med_ticaqrelor">Ticaqrelor</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -475,7 +597,19 @@ function dt($field, $type)
                 <div class="section-title text-danger" style="margin-top:0;">
                     <i class="bi bi-card-checklist"></i> 8. ส่วนประเมินแรกรับ (Triage Assessment)
                 </div>
-
+                <div class="p-3 mb-3 bg-white rounded border border-danger border-opacity-25 shadow-sm">
+                    <div class="col-md-5 ">
+                    <div class="mb-2">
+                            <label class="form-label small text-muted mb-0">เวลาที่เริ่มมีอาการ (Onset)</label>
+                            <div class="input-group input-group-sm">
+                                <input type="date" class="form-control" name="onsetTime_onset_date" value="<?= dt('onset_datetime', 'd') ?>">
+                                <input type="time" class="form-control" name="onsetTime_onset_time" value="<?= dt('onset_datetime', 't') ?>">
+                            </div>
+                    </div>
+                </div>
+                </div>
+                
+                
                 <div class="p-3 mb-4 bg-white rounded border border-danger border-opacity-25 shadow-sm">
                     <p class="fs-5 fw-bold text-danger mb-2">ผู้ป่วยเข้าเกณฑ์ Stroke Fast Track หรือไม่?</p>
                     <div class="d-flex align-items-center gap-3">
@@ -542,33 +676,57 @@ function dt($field, $type)
                             </div>
                             <div class="col-md-3">
                                 <label for="nihss" class="form-label fw-bold text-primary">NIHSS</label>
-                                <input type="number" class="form-control form-control-lg border-primary text-center fw-bold" id="nihss" placeholder="0-42" min="0" max="42" name="nihss" required value="<?= val('nihss_score') ?>">
+                                <input type="number" class="form-control form-control-lg border-primary text-center fw-bold" id="nihss" placeholder="0-42" min="0" max="42" oninput="if(parseInt(this.value) > 42) this.value = 42; if(parseInt(this.value) < 0) this.value = 0;" name="nihss" required value="<?= val('nihss_score') ?>">
                             </div>
                         </div>
                     </div>
 
                     <div class="col-md-5 border-start">
                         <h6 class="fw-bold text-secondary mb-3"><i class="bi bi-clock-history"></i> เวลา (Time)</h6>
+                        
+                        
                         <div class="mb-2">
-                            <label class="form-label small text-muted mb-0">เวลาที่เริ่มมีอาการ (Onset)</label>
-                            <div class="input-group input-group-sm">
-                                <input type="date" class="form-control" name="onsetTime_onset_date" value="<?= dt('onset_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="onsetTime_onset_time" value="<?= dt('onset_datetime', 't') ?>">
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small text-muted mb-0">เวลาที่รถออก (Departure)</label>
-                            <div class="input-group input-group-sm">
-                                <input type="date" class="form-control" name="departureTime_date" value="<?= dt('departure_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="departureTime_time" value="<?= dt('departure_datetime', 't') ?>">
-                            </div>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label small text-muted mb-0">เวลาที่ถึง รพ. (Arrival)</label>
+                            <label class="form-label small text-muted mb-0">เวลาที่ถึง รพ.หาดใหญ่ (Arrival)</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" name="arrivalTime_date" value="<?= dt('hospital_arrival_datetime', 'd') ?>">
                                 <input type="time" class="form-control" name="arrivalTime_time" value="<?= dt('hospital_arrival_datetime', 't') ?>">
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-form bg-light border-primary border-opacity-25">
+                <div class="section-title text-primary" style="margin-top:0;">
+                    <i class="bi bi-stopwatch"></i> 9. สรุป Time Process of Care
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-6" id="calc_refer_section" style="display: none;">
+                        <label class="form-label fw-bold">1. Onset to Hospital Level รพช. (นาที)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-calculator"></i></span>
+                            <input type="number" class="form-control fw-bold text-primary" 
+                                   id="calc_onset_to_refer" name="time_onset_to_refer_min" 
+                                   readonly placeholder="คำนวณอัตโนมัติ...">
+                            <span class="input-group-text">นาที</span>
+                        </div>
+                        <div class="form-text text-muted small">
+                            (เวลาที่ถึง รพ.ต้นทาง - เวลาที่เริ่มมีอาการ)
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">2. Onset to Hospital Level รพ.หาดใหญ่ (นาที)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white"><i class="bi bi-calculator"></i></span>
+                            <input type="number" class="form-control fw-bold text-danger" 
+                                   id="calc_onset_to_hatyai" name="time_onset_to_hatyai_min" 
+                                   readonly placeholder="คำนวณอัตโนมัติ...">
+                            <span class="input-group-text">นาที</span>
+                        </div>
+                        <div class="form-text text-muted small">
+                            (เวลาที่ถึง รพ.หาดใหญ่ - เวลาที่เริ่มมีอาการ)
+                            <span id="calc_arrival_type_badge" class="badge bg-secondary ms-1"></span>
                         </div>
                     </div>
                 </div>
@@ -829,6 +987,130 @@ function dt($field, $type)
                     });
                 });
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- TIME CALCULATION LOGIC (UPDATED FOR EMS) ---
+
+            // 1. Onset (เวลาเริ่มมีอาการ)
+            const onsetDate = document.querySelector('input[name="onsetTime_onset_date"]');
+            const onsetTime = document.querySelector('input[name="onsetTime_onset_time"]');
+
+            // 2. Refer Arrival (เวลาถึง รพ.ชุมชน - Part 5)
+            const referDate = document.querySelector('input[name="refer_arrival_date"]');
+            const referTime = document.querySelector('input[name="refer_arrival_time"]');
+
+            // 3. EMS Contact (เวลาเจ้าหน้าที่ไปถึงตัวผู้ป่วย - Part 5)
+            const emsDate = document.querySelector('input[name="first_medical_contact_date"]');
+            const emsTime = document.querySelector('input[name="first_medical_contact_time"]');
+
+            // 4. Walk-in Arrival (เวลาถึง ER - Part 5)
+            const walkinDate = document.querySelector('input[name="er_arrival_date"]');
+            const walkinTime = document.querySelector('input[name="er_arrival_time"]');
+
+            // 5. Hatyai Arrival (เวลาถึง รพ.หาดใหญ่ - Part 8)
+            const hatyaiDate = document.querySelector('input[name="arrivalTime_date"]');
+            const hatyaiTime = document.querySelector('input[name="arrivalTime_time"]');
+
+            // Radio Arrival Type
+            const arrivalRadios = document.querySelectorAll('input[name="arrival_type"]');
+            
+            // Output Fields
+            const outRefer = document.getElementById('calc_onset_to_refer');
+            const outHatyai = document.getElementById('calc_onset_to_hatyai');
+            const sectionRefer = document.getElementById('calc_refer_section');
+            const badgeType = document.getElementById('calc_arrival_type_badge');
+
+            // ฟังก์ชันคำนวณความต่างเวลา (นาที)
+            function calculateDiffMinutes(d1, t1, d2, t2) {
+                if (!d1 || !t1 || !d2 || !t2) return '';
+                const start = new Date(`${d1}T${t1}`);
+                const end = new Date(`${d2}T${t2}`);
+                const diffMs = end - start;
+                return Math.floor(diffMs / 60000); // แปลงเป็นนาที
+            }
+
+            // ฟังก์ชัน Sync เวลาจาก Walk-in Part 5 -> Part 8
+            function syncWalkInToHatyai() {
+                const currentType = document.querySelector('input[name="arrival_type"]:checked')?.value;
+                if (currentType === 'walk_in') {
+                    if (walkinDate && hatyaiDate) hatyaiDate.value = walkinDate.value;
+                    if (walkinTime && hatyaiTime) hatyaiTime.value = walkinTime.value;
+                }
+            }
+
+            function updateCalculations() {
+                const currentType = document.querySelector('input[name="arrival_type"]:checked')?.value || '';
+                const isRefer = (currentType === 'refer');
+
+                // --- 1. จัดการการแสดงผล ---
+                if (sectionRefer) sectionRefer.style.display = isRefer ? 'block' : 'none';
+                
+                if(currentType === 'ems') badgeType.textContent = 'EMS (First Contact)';
+                else if(currentType === 'walk_in') badgeType.textContent = 'Walk-in';
+                else if(currentType === 'refer') badgeType.textContent = 'Refer';
+                else badgeType.textContent = '';
+
+                // --- 2. Logic การคำนวณ ---
+                
+                // A. คำนวณ Onset -> Refer Hospital (เฉพาะ Refer)
+                if (isRefer) {
+                    const minsRefer = calculateDiffMinutes(onsetDate.value, onsetTime.value, referDate.value, referTime.value);
+                    outRefer.value = (minsRefer !== '' && !isNaN(minsRefer)) ? minsRefer : '';
+                } else {
+                    outRefer.value = ''; 
+                }
+
+                // B. คำนวณ Onset -> Hatyai Hospital (แยกเคส)
+                let minsHatyai = '';
+
+                if (currentType === 'ems') {
+                    // *** แก้ไขตามที่ขอ: ใช้เวลา EMS Header (Part 5) ลบ Onset ***
+                    minsHatyai = calculateDiffMinutes(onsetDate.value, onsetTime.value, emsDate.value, emsTime.value);
+
+                } else if (currentType === 'walk_in') {
+                    // Walk-in: Sync ไป Part 8 ก่อน แล้วคำนวณ
+                    syncWalkInToHatyai();
+                    minsHatyai = calculateDiffMinutes(onsetDate.value, onsetTime.value, hatyaiDate.value, hatyaiTime.value);
+                
+                } else {
+                    // กรณี Refer หรืออื่นๆ: ใช้เวลาถึง รพ.หาดใหญ่ (Part 8) ปกติ
+                    minsHatyai = calculateDiffMinutes(onsetDate.value, onsetTime.value, hatyaiDate.value, hatyaiTime.value);
+                }
+
+                outHatyai.value = (minsHatyai !== '' && !isNaN(minsHatyai)) ? minsHatyai : '';
+            }
+
+            // --- Event Listeners ---
+
+            // Onset
+            if(onsetDate) onsetDate.addEventListener('change', updateCalculations);
+            if(onsetTime) onsetTime.addEventListener('change', updateCalculations);
+
+            // Refer
+            if(referDate) referDate.addEventListener('change', updateCalculations);
+            if(referTime) referTime.addEventListener('change', updateCalculations);
+
+            // EMS (เพิ่มใหม่)
+            if(emsDate) emsDate.addEventListener('change', updateCalculations);
+            if(emsTime) emsTime.addEventListener('change', updateCalculations);
+
+            // Walk-in
+            if(walkinDate) walkinDate.addEventListener('change', updateCalculations);
+            if(walkinTime) walkinTime.addEventListener('change', updateCalculations);
+
+            // Hatyai Arrival
+            if(hatyaiDate) hatyaiDate.addEventListener('change', updateCalculations);
+            if(hatyaiTime) hatyaiTime.addEventListener('change', updateCalculations);
+
+            // Radio Buttons
+            arrivalRadios.forEach(radio => {
+                radio.addEventListener('change', updateCalculations);
+            });
+
+            // Run on load
+            updateCalculations();
         });
     </script>
 </body>

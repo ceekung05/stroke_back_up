@@ -80,6 +80,10 @@ $year_query = $conn->query($year_sql);
             <i class="bi bi-heart-pulse-fill"></i>
             <span>Stroke Care</span>
         </div>
+        <hr class="sidebar-divider">
+        <a href="dashboard.php" >
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
         
         <a href="index.php" class="active">
             <i class="bi bi-list-task"></i> รายชื่อผู้ป่วย (Patient List)

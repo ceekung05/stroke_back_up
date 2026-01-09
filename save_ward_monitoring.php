@@ -1,18 +1,18 @@
 <?php
 session_start();
-require_once 'connectdb.php'; 
+require_once 'connectdb.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // 1. รับชื่อผู้ใช้งานจาก Session
-    $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
-
+    // แก้ไข: รับชื่อผู้ใช้ให้ชัวร์
+    $sess_user = $_SESSION['user_data'] ?? [];
+    $current_user = $sess_user['HR_FNAME'] ?? $sess_user['hr_fname'] ?? 'System';
     $admission_id = $_POST['admission_id'] ?? '';
-    
+
     // รวมวันเวลา
-    $record_datetime = $_POST['record_datetime'] ?? null; 
+    $record_datetime = $_POST['record_datetime'] ?? null;
     if ($record_datetime) {
-        $record_datetime = str_replace('T', ' ', $record_datetime) . ':00'; 
+        $record_datetime = str_replace('T', ' ', $record_datetime) . ':00';
     }
 
     $sbp = $_POST['sbp'] ?? null;
@@ -34,8 +34,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 3. แก้ bind_param (เพิ่ม s 2 ตัวท้ายสุด สำหรับ created_by และ updated_by)
     // Types: i(id) s(time) i(sbp) i(dbp) i(nihss) s(gcs) s(create) s(update)
-    $stmt->bind_param("isiiisss", 
-        $admission_id, $record_datetime, $sbp, $dbp, $nihss, $gcs, 
+    $stmt->bind_param(
+        "isiiisss",
+        $admission_id,
+        $record_datetime,
+        $sbp,
+        $dbp,
+        $nihss,
+        $gcs,
         $current_user, // created_by
         $current_user  // updated_by (ใส่ค่าเริ่มต้นให้เหมือนคนสร้าง)
     );
@@ -47,4 +53,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'error', 'message' => $stmt->error]);
     }
 }
-?>

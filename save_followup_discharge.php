@@ -3,9 +3,9 @@ session_start();
 require_once 'connectdb.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // 1. รับชื่อผู้ใช้งาน
-    $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
-
+    // แก้ไข: รับชื่อผู้ใช้ให้ชัวร์
+    $sess_user = $_SESSION['user_data'] ?? [];
+    $current_user = $sess_user['HR_FNAME'] ?? $sess_user['hr_fname'] ?? 'System';
     $admission_id = $_POST['admission_id'] ?? '';
     $first_followup_date = $_POST['first_followup_date'] ?? null;
     $discharge_destination = $_POST['discharge_destination'] ?? null;
@@ -35,4 +35,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'error', 'message' => $stmt->error]);
     }
 }
-?>

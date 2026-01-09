@@ -11,7 +11,9 @@ function combineDateTime($date, $time) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // 1. รับชื่อผู้ใช้งาน
-    $current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
+    // แก้ไข: รับชื่อผู้ใช้ให้ชัวร์
+$sess_user = $_SESSION['user_data'] ?? [];
+$current_user = $sess_user['HR_FNAME'] ?? $sess_user['hr_fname'] ?? 'System';
 
     $admission_id = $_POST['admission_id'] ?? '';
     if (empty($admission_id)) {

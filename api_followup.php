@@ -3,8 +3,9 @@ session_start();
 require_once 'connectdb.php';
 header('Content-Type: application/json');
 
-// 1. รับชื่อผู้ใช้งาน
-$current_user = $_SESSION['user_data']['hr_fname'] ?? 'System';
+// แก้ไข: รับชื่อผู้ใช้ให้ชัวร์
+$sess_user = $_SESSION['user_data'] ?? [];
+$current_user = $sess_user['HR_FNAME'] ?? $sess_user['hr_fname'] ?? 'System';
 
 $action = $_POST['action'] ?? '';
 $admission_id = $_POST['admission_id'] ?? '';
