@@ -244,6 +244,7 @@ $hemo_op_data = fetchSingle($conn, $sql_hemo_op);
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // --- Config สำหรับ PDF ---
     function exportPDF() {
         const element = document.getElementById('reportContent');
         const opt = {
@@ -255,7 +256,7 @@ $hemo_op_data = fetchSingle($conn, $sql_hemo_op);
         html2pdf().set(opt).from(element).save();
     }
 
-    // Prepare Data
+    // --- ข้อมูลกราฟ ---
     const occlusionData = <?= json_encode($occlusion_data) ?>;
     const complicationData = <?= json_encode($complication_data) ?>;
     const hemoOpData = <?= json_encode($hemo_op_data) ?>;
@@ -264,29 +265,113 @@ $hemo_op_data = fetchSingle($conn, $sql_hemo_op);
     const ticiData = <?= json_encode($tici_data) ?>;
     const mrsData = <?= json_encode($mrs_data) ?>;
 
-    // 1. Occlusion Chart
+    // --- ชุดสี Cotton Candy Palette ---
+    const pastelColors = [
+        '#FFB7B2', // ชมพูพีช
+        '#A0C4FF', // ฟ้าพาสเทล
+        '#BDB2FF', // ม่วงลาเวนเดอร์
+        '#FFDAC1', // ส้มไข่ไก่
+        '#E2F0CB', // เขียวอ่อน
+        '#FF9AA2'  // แดงกุหลาบ
+    ];
+
+    // 1. Occlusion Chart (Bar - แนวนอน)
     new Chart(document.getElementById('chartOcclusion'), {
-        type: 'bar', data: { labels: occlusionData.map(d=>d.occlusion_site), datasets: [{ label:'จำนวน', data: occlusionData.map(d=>d.count), backgroundColor:'#4e73df' }] }, options: { maintainAspectRatio: false, indexAxis: 'y' }
+        type: 'bar',
+        data: {
+            labels: occlusionData.map(d => d.occlusion_site),
+            datasets: [{
+                label: 'จำนวนเคส',
+                data: occlusionData.map(d => d.count),
+                backgroundColor: '#A0C4FF', // ฟ้าพาสเทล
+                borderRadius: 8
+            }]
+        },
+        options: { maintainAspectRatio: false, indexAxis: 'y' }
     });
 
-    // 2. Complication Chart
+    // 2. Complication Chart (Doughnut)
     new Chart(document.getElementById('chartComplication'), {
-        type: 'doughnut', data: { labels: complicationData.map(d=>d.complication_details), datasets: [{ data: complicationData.map(d=>d.count), backgroundColor: ['#1cc88a','#f6c23e','#e74a3b'] }] }, options: { maintainAspectRatio: false, plugins:{legend:{position:'right'}} }
+        type: 'doughnut',
+        data: {
+            labels: complicationData.map(d => d.complication_details),
+            datasets: [{
+                data: complicationData.map(d => d.count),
+                backgroundColor: pastelColors, // ใช้ชุดสีรวม
+                hoverOffset: 4
+            }]
+        },
+        options: { maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
     });
 
-    // 3. Hemo Op Chart
+    // 3. Hemo Op Chart (Pie)
     new Chart(document.getElementById('chartHemoOp'), {
-        type: 'pie', data: { labels: ['Operated (ผ่าตัด)', 'Conservative (ไม่ผ่า)'], datasets: [{ data: [hemoOpData.operated, hemoOpData.conservative], backgroundColor: ['#e74a3b','#858796'] }] }, options: { maintainAspectRatio: false }
+        type: 'pie',
+        data: {
+            labels: ['Operated (ผ่าตัด)', 'Conservative (ไม่ผ่า)'],
+            datasets: [{
+                data: [hemoOpData.operated, hemoOpData.conservative],
+                backgroundColor: ['#FF9AA2', '#E2F0CB'] // แดงพาสเทล vs เขียวพาสเทล
+            }]
+        },
+        options: { maintainAspectRatio: false }
     });
 
-    // Others...
-    new Chart(document.getElementById('chartFibro'), { type: 'pie', data: { labels: fibroData.map(d=>d.fibrinolytic_type), datasets: [{ data: fibroData.map(d=>d.count), backgroundColor: ['#e74a3b','#4e73df','#1cc88a'] }] }, options: { maintainAspectRatio: false } });
-    new Chart(document.getElementById('chartArrival'), { type: 'doughnut', data: { labels: arrivalData.map(d=>d.arrival_type), datasets: [{ data: arrivalData.map(d=>d.count), backgroundColor: ['#4e73df','#1cc88a','#36b9cc','#f6c23e'] }] }, options: { maintainAspectRatio: false } });
-    new Chart(document.getElementById('chartTici'), { type: 'bar', data: { labels: ticiData.map(d=>'Score '+d.mt_tici_score), datasets: [{ label:'Cases', data: ticiData.map(d=>d.count), backgroundColor:'#36b9cc' }] }, options: { maintainAspectRatio: false } });
-    new Chart(document.getElementById('chartMrs'), { type: 'bar', data: { labels: mrsData.map(d=>'mRS '+d.discharge_mrs), datasets: [{ label:'Patients', data: mrsData.map(d=>d.count), backgroundColor:'#f6c23e' }] }, options: { maintainAspectRatio: false } });
+    // 4. Fibrinolytic (Pie)
+    new Chart(document.getElementById('chartFibro'), {
+        type: 'pie',
+        data: {
+            labels: fibroData.map(d => d.fibrinolytic_type),
+            datasets: [{
+                data: fibroData.map(d => d.count),
+                backgroundColor: pastelColors
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
 
-    
-    
+    // 5. Arrival Type (Doughnut)
+    new Chart(document.getElementById('chartArrival'), {
+        type: 'doughnut',
+        data: {
+            labels: arrivalData.map(d => d.arrival_type),
+            datasets: [{
+                data: arrivalData.map(d => d.count),
+                backgroundColor: pastelColors
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
+
+    // 6. TICI Score (Bar - แนวตั้ง)
+    new Chart(document.getElementById('chartTici'), {
+        type: 'bar',
+        data: {
+            labels: ticiData.map(d => 'Score ' + d.mt_tici_score),
+            datasets: [{
+                label: 'Cases',
+                data: ticiData.map(d => d.count),
+                backgroundColor: '#BDB2FF', // ม่วงพาสเทล
+                borderRadius: 8
+            }]
+        },
+        options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
+
+    // 7. mRS (Bar - แนวตั้ง)
+    new Chart(document.getElementById('chartMrs'), {
+        type: 'bar',
+        data: {
+            labels: mrsData.map(d => 'mRS ' + d.discharge_mrs),
+            datasets: [{
+                label: 'Patients',
+                data: mrsData.map(d => d.count),
+                backgroundColor: '#FFDAC1', // ส้มพาสเทล
+                borderRadius: 8
+            }]
+        },
+        options: { maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+    });
 </script>
 </body>
 </html>
