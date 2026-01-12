@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connectdb.php'; // เชื่อมต่อฐานข้อมูล
+require_once 'connectdb.php'; 
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: login.php");
@@ -8,21 +8,29 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 }
 $user = $_SESSION['user_data'];
 
-// --- ส่วนดึงข้อมูลเก่า (Edit Mode) ---
 $admission_id = $_GET['admission_id'] ?? '';
 $row = []; 
+$hospital_arrival_datetime = ""; 
 
 if ($admission_id) {
-    // ดึงข้อมูลจาก tbl_er
     $sql = "SELECT * FROM tbl_er WHERE admission_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $admission_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
+
+    $sql_adm = "SELECT hospital_arrival_datetime FROM tbl_stroke_admission WHERE id = ?";
+    $stmt_adm = $conn->prepare($sql_adm);
+    $stmt_adm->bind_param("i", $admission_id);
+    $stmt_adm->execute();
+    $res_adm = $stmt_adm->get_result();
+    $row_adm = $res_adm->fetch_assoc();
+    if($row_adm) {
+        $hospital_arrival_datetime = $row_adm['hospital_arrival_datetime'];
+    }
 }
 
-// --- ฟังก์ชันช่วยแสดงผล ---
 function val($field) { global $row; return htmlspecialchars($row[$field] ?? ''); }
 function chk($field, $value = 1) { global $row; return (isset($row[$field]) && $row[$field] == $value) ? 'checked' : ''; }
 function sel($field, $value) { global $row; return (isset($row[$field]) && $row[$field] == $value) ? 'selected' : ''; }
@@ -30,8 +38,8 @@ function dt($field, $type) {
     global $row; 
     if (empty($row[$field])) return '';
     $dt = explode(' ', $row[$field]);
-    if ($type == 'd') return $dt[0]; // วันที่
-    if ($type == 't') return substr($dt[1], 0, 5); // เวลา
+    if ($type == 'd') return $dt[0]; 
+    if ($type == 't') return substr($dt[1], 0, 5); 
     return '';
 }
 ?>
@@ -44,10 +52,13 @@ function dt($field, $type) {
     <title>2. ER - ระบบ Stroke Care</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -99,15 +110,19 @@ function dt($field, $type) {
 
         <form id="erForm" onsubmit="return false;">
             <input type="hidden" name="admission_id" value="<?= $admission_id ?>">
+            <input type="hidden" id="hospital_arrival_db" value="<?= $hospital_arrival_datetime ?>">
             
-            
-
             <div class="card-form">
                 <div class="section-title" style="margin-top:0;">
                     <i class="bi bi-clock-history"></i> 2. ลำดับเวลาการตรวจรักษา (Clinical Timeline)
                 </div>
                 
-                <h6 class="fw-bold text-secondary mb-2">2.1 การปรึกษาแพทย์ประสาทวิทยา (Neurologist)</h6>
+                <div class="alert alert-info py-2 mb-3">
+                    <i class="bi bi-info-circle-fill"></i> เวลาที่ผู้ป่วยมาถึงโรงพยาบาล (Hospital Arrival): 
+                    <strong><?= $hospital_arrival_datetime ? date('d/m/Y H:i', strtotime($hospital_arrival_datetime)) : 'ยังไม่ระบุ (กรุณาระบุในหน้า 1)' ?></strong>
+                </div>
+
+                <h6 class="fw-bold text-secondary mb-2">2.1 เวลาที่แพทย์ตรวจ</h6>
                 <div class="row g-3 mb-4">
                     <div class="col-md-3">
                         <label for="consult_neuro_date" class="form-label">วันที่ส่งปรึกษา</label>
@@ -115,7 +130,14 @@ function dt($field, $type) {
                     </div>
                     <div class="col-md-3">
                         <label for="consult_neuro_time_input" class="form-label">เวลา</label>
-                        <input type="time" id="consult_neuro_time_input" name="consult_neuro_time_input" class="form-control" value="<?= dt('consult_neuro_datetime', 't') ?>">
+                        <input  type="text" class="form-control timepicker"  placeholder="คลิกเพื่อเลือกเวลา" id="consult_neuro_time_input" name="consult_neuro_time_input"  value="<?= dt('consult_neuro_datetime', 't') ?>">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-primary">Door to Consult Neurologist (นาที)</label>
+                        <div class="input-group">
+                             <span class="input-group-text bg-primary bg-opacity-10 text-primary"><i class="bi bi-calculator"></i></span>
+                             <input type="text" class="form-control fw-bold text-primary bg-primary bg-opacity-10" id="calc_door_to_doctor" name="time_door_to_doctor_min" readonly placeholder="..." value="<?= val('time_door_to_doctor_min') ?>">
+                        </div>
                     </div>
                 </div>
                 
@@ -127,21 +149,31 @@ function dt($field, $type) {
                         <label class="form-label fw-bold text-primary">CT non-contrast</label>
                         <div class="input-group input-group-sm mb-2">
                             <input type="date" class="form-control" id="ctncDate" name="ctncDate" value="<?= dt('ctnc_datetime', 'd') ?>">
-                            <input type="time" class="form-control" id="ctncTime_input" name="ctncTime_input" value="<?= dt('ctnc_datetime', 't') ?>">
+                            <input type="text" class="form-control timepicker" placeholder="เวลา" id="ctncTime_input" name="ctncTime_input" value="<?= dt('ctnc_datetime', 't') ?>">
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <label class="form-label small fw-bold text-primary mb-1">Door to CT (นาที)</label>
+                            <input type="text" class="form-control form-control-sm fw-bold text-primary" id="calc_door_to_ct" name="time_door_to_ct_min" readonly placeholder="..." value="<?= val('time_door_to_ct_min') ?>">
                         </div>
                     </div>
+
                     <div class="col-md-4 border-end">
                         <label class="form-label fw-bold text-primary">CTA</label>
                         <div class="input-group input-group-sm mb-2">
                             <input type="date" class="form-control" id="ctaTime" name="ctaTime" value="<?= dt('cta_datetime', 'd') ?>">
-                            <input type="time" class="form-control" id="ctaTime_input" name="ctaTime_input" value="<?= dt('cta_datetime', 't') ?>">
+                            <input type="text" class="form-control timepicker" placeholder="เวลา" id="ctaTime_input" name="ctaTime_input" value="<?= dt('cta_datetime', 't') ?>">
+                        </div>
+                        <div class="bg-primary bg-opacity-10 p-2 rounded">
+                            <label class="form-label small fw-bold text-primary mb-1">Door to CTA (นาที)</label>
+                            <input type="text" class="form-control form-control-sm fw-bold text-primary" id="calc_door_to_cta" name="time_door_to_cta_min" readonly placeholder="..." value="<?= val('time_door_to_cta_min') ?>">
                         </div>
                     </div>
+
                     <div class="col-md-4">
                         <label class="form-label fw-bold text-primary">MRI</label>
                         <div class="input-group input-group-sm mb-2">
                             <input type="date" class="form-control" id="mriTime" name="mriTime" value="<?= dt('mri_datetime', 'd') ?>">
-                            <input type="time" class="form-control" id="mriTime_input" name="mriTime_input" value="<?= dt('mri_datetime', 't') ?>">
+                            <input type="text" class="form-control timepicker" placeholder="เวลา" id="mriTime_input" name="mriTime_input" value="<?= dt('mri_datetime', 't') ?>">
                         </div>
                     </div>
                 </div>
@@ -156,7 +188,15 @@ function dt($field, $type) {
                     </div>
                     <div class="col-md-3">
                         <label for="consult_intervention_time_input" class="form-label">เวลา</label>
-                        <input type="time" class="form-control" id="consult_intervention_time_input" name="consult_intervention_time_input" value="<?= dt('consult_intervention_datetime', 't') ?>">
+                        <input type="text" class="form-control timepicker" placeholder="คลิกเพื่อเลือกใส่เวลา" id="consult_intervention_time_input" name="consult_intervention_time_input" value="<?= dt('consult_intervention_datetime', 't') ?>">
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold text-primary">Door to Consult Interventionist (นาที)</label>
+                        <div class="input-group">
+                             <span class="input-group-text bg-primary bg-opacity-10 text-primary"><i class="bi bi-calculator"></i></span>
+                             <input type="text" class="form-control fw-bold text-primary bg-primary bg-opacity-10" id="calc_door_to_intervention" name="time_door_to_intervention_min" readonly placeholder="..." value="<?= val('time_door_to_intervention_min') ?>">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -236,8 +276,8 @@ function dt($field, $type) {
                 <div class="mb-4 p-3 bg-white border rounded shadow-sm">
                     <label class="form-label fw-bold mb-2">1. ยาละลายลิ่มเลือด (Fibrinolytic)</label>
                     <div class="row g-3 align-items-center">
-                        <div class="col-md-8">
-                            <div class="btn-group w-100" role="group">
+                        <div class="col-md-12">
+                            <div class="btn-group w-100 mb-3" role="group">
                                 <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_rtpa" value="rtpa" <?= chk('fibrinolytic_type', 'rtpa') ?>>
                                 <label class="btn btn-outline-primary" for="fib_rtpa">rt-PA</label>
 
@@ -251,10 +291,19 @@ function dt($field, $type) {
                                 <label class="btn btn-outline-secondary" for="fib_no">NO (ไม่ให้ยา)</label>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        
+                        <div class="col-md-5">
                             <div class="input-group">
-                                <span class="input-group-text bg-light">เวลาเริ่มยา</span>
-                                <input type="time" class="form-control" id="tpaTime" name="tpaTime" value="<?= val('tpa_start_time') ?>">
+                                <span class="input-group-text bg-light">เริ่มยา (Start)</span>
+                                <input type="date" class="form-control" id="tpaDate" name="tpaDate" value="<?= dt('tpa_datetime', 'd') ?>">
+                                <input type="text" class="form-control timepicker" placeholder="เวลา" id="tpaTime" name="tpaTime" value="<?= dt('tpa_datetime', 't') ?>">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-success bg-opacity-25 fw-bold text-success">Door to Needle</span>
+                                <input type="text" class="form-control fw-bold text-success bg-success bg-opacity-10" id="calc_door_to_needle" name="time_door_to_needle_min" readonly placeholder="นาที" value="<?= val('time_door_to_needle_min') ?>">
                             </div>
                         </div>
                     </div>
@@ -267,14 +316,14 @@ function dt($field, $type) {
                             <label for="anesthesiaTime" class="form-label text-muted small">Set ดมยา (Anesthesia Set)</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" id="anesthesiaTime" name="anesthesiaTime_date" value="<?= dt('anesthesia_set_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="anesthesiaTime_time" value="<?= dt('anesthesia_set_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" placeholder="คลิกเพื่อเลือกใส่เวลา" name="anesthesiaTime_time" value="<?= dt('anesthesia_set_datetime', 't') ?>">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <label for="punctureTime" class="form-label text-muted small">Activate Team</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" id="punctureTime" name="punctureTime_date" value="<?= dt('activate_team_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="punctureTime_time" value="<?= dt('activate_team_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" placeholder="คลิกเพื่อเลือกใส่เวลา" name="punctureTime_time" value="<?= dt('activate_team_datetime', 't') ?>" placeholder="คลิกเพื่อเลือกใส่เงลา">
                             </div>
                         </div>
                     </div>
@@ -286,11 +335,18 @@ function dt($field, $type) {
                     <i class="bi bi-bandaid"></i> B. แนวทาง Hemorrhagic Stroke
                 </div>
                 <div class="p-4 bg-danger bg-opacity-10 rounded border border-danger">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="consultNS" name="consultNS" value="1" <?= chk('consult_neurosurgeon') ?>>
-                        <label class="form-check-label fw-bold text-danger fs-5" for="consultNS">
-                            <i class="bi bi-telephone-forward me-2"></i> ปรึกษาศัลยแพทย์ระบบประสาท (Consult Neurosurgeon)
-                        </label>
+                    <label class="form-label fw-bold text-danger fs-5 mb-2">
+                        <i class="bi bi-telephone-forward me-2"></i> ปรึกษาศัลยแพทย์ระบบประสาท (Consult Neurosurgeon)
+                    </label>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small">วันที่ปรึกษา</label>
+                            <input type="date" class="form-control" name="consultNS_date" value="<?= dt('consult_neurosurgeon_datetime', 'd') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-muted small">เวลา</label>
+                            <input type="text" class="form-control timepicker" name="consultNS_time" value="<?= dt('consult_neurosurgeon_datetime', 't') ?>" placeholder="--:--">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -311,41 +367,164 @@ function dt($field, $type) {
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Logic Show/Hide Ischemic/Hemorrhagic
+            // --------------------------------------------------------
+            // 1. ฟังก์ชันคำนวณเวลา (Calculator Logic)
+            // --------------------------------------------------------
+            const hospitalArrivalVal = document.getElementById('hospital_arrival_db').value;
+            
+            const outDoorDoctor = document.getElementById('calc_door_to_doctor');
+            const outDoorCT = document.getElementById('calc_door_to_ct');
+            const outDoorCTA = document.getElementById('calc_door_to_cta');
+            const outDoorIntervention = document.getElementById('calc_door_to_intervention');
+            // [ใหม่] Output Door to Needle
+            const outDoorNeedle = document.getElementById('calc_door_to_needle');
+
+            // เตรียมค่า Arrival Date Part (YYYY-MM-DD) ไว้ใช้เติมอัตโนมัติ
+            let defaultDate = '';
+            if(hospitalArrivalVal) {
+                defaultDate = hospitalArrivalVal.split(' ')[0]; // ดึงเฉพาะวันที่
+            }
+
+            function calculateMinutes(startStr, endStr) {
+                if(!startStr || !endStr) return '';
+                const start = new Date(startStr.replace(' ', 'T')); 
+                const end = new Date(endStr);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) return ''; 
+                const diffMs = end - start; 
+                return Math.floor(diffMs / 60000); 
+            }
+
+            window.updateErCalculations = function() {
+                if(!hospitalArrivalVal) return;
+                const arrivalDateTime = hospitalArrivalVal.replace(' ', 'T'); 
+
+                // A. Door to Consult Neurologist
+                const docDateInput = document.getElementById('consult_neuro_date');
+                const docTimeInput = document.getElementById('consult_neuro_time_input');
+                if(docTimeInput.value && !docDateInput.value && defaultDate) { docDateInput.value = defaultDate; }
+
+                if(docDateInput.value && docTimeInput.value) {
+                    const minDoc = calculateMinutes(arrivalDateTime, `${docDateInput.value}T${docTimeInput.value}`);
+                    outDoorDoctor.value = (minDoc !== '' && !isNaN(minDoc)) ? minDoc : '';
+                } else { outDoorDoctor.value = ''; }
+
+                // B. Door to CT
+                const ctDateInput = document.getElementById('ctncDate');
+                const ctTimeInput = document.getElementById('ctncTime_input');
+                if(ctTimeInput.value && !ctDateInput.value && defaultDate) { ctDateInput.value = defaultDate; }
+
+                if(ctDateInput.value && ctTimeInput.value) {
+                    const minCT = calculateMinutes(arrivalDateTime, `${ctDateInput.value}T${ctTimeInput.value}`);
+                    outDoorCT.value = (minCT !== '' && !isNaN(minCT)) ? minCT : '';
+                } else { outDoorCT.value = ''; }
+
+                // C. Door to CTA
+                const ctaDateInput = document.getElementById('ctaTime');
+                const ctaTimeInput = document.getElementById('ctaTime_input');
+                if(ctaTimeInput.value && !ctaDateInput.value && defaultDate) { ctaDateInput.value = defaultDate; }
+
+                if(ctaDateInput.value && ctaTimeInput.value) {
+                    const minCTA = calculateMinutes(arrivalDateTime, `${ctaDateInput.value}T${ctaTimeInput.value}`);
+                    outDoorCTA.value = (minCTA !== '' && !isNaN(minCTA)) ? minCTA : '';
+                } else { outDoorCTA.value = ''; }
+
+                // D. Door to Interventionist
+                const interDateInput = document.getElementById('consult_intervention_time');
+                const interTimeInput = document.getElementById('consult_intervention_time_input');
+                if(interTimeInput.value && !interDateInput.value && defaultDate) { interDateInput.value = defaultDate; }
+
+                if(interDateInput.value && interTimeInput.value) {
+                    const minInter = calculateMinutes(arrivalDateTime, `${interDateInput.value}T${interTimeInput.value}`);
+                    outDoorIntervention.value = (minInter !== '' && !isNaN(minInter)) ? minInter : '';
+                } else { outDoorIntervention.value = ''; }
+
+                // E. [ใหม่] Door to Needle Time
+                const tpaDateInput = document.getElementById('tpaDate');
+                const tpaTimeInput = document.getElementById('tpaTime');
+                // Auto Fill Date
+                if(tpaTimeInput.value && !tpaDateInput.value && defaultDate) { tpaDateInput.value = defaultDate; }
+
+                if(tpaDateInput.value && tpaTimeInput.value) {
+                    const minNeedle = calculateMinutes(arrivalDateTime, `${tpaDateInput.value}T${tpaTimeInput.value}`);
+                    outDoorNeedle.value = (minNeedle !== '' && !isNaN(minNeedle)) ? minNeedle : '';
+                } else { outDoorNeedle.value = ''; }
+            };
+
+            // --------------------------------------------------------
+            // 2. ตั้งค่า Flatpickr + สั่งคำนวณทันที
+            // --------------------------------------------------------
+            flatpickr(".timepicker", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                allowInput: true,
+                onClose: function(selectedDates, dateStr, instance) {
+                    updateErCalculations(); 
+                }
+            });
+
+            // --------------------------------------------------------
+            // 3. ตัวดักจับเหตุการณ์ (Event Listeners)
+            // --------------------------------------------------------
+            const inputsCalc = [
+                document.getElementById('consult_neuro_date'),
+                document.getElementById('ctncDate'),
+                document.getElementById('ctaTime'),
+                document.getElementById('consult_neuro_time_input'),
+                document.getElementById('ctncTime_input'),
+                document.getElementById('ctaTime_input'),
+                
+                document.getElementById('consult_intervention_time'),
+                document.getElementById('consult_intervention_time_input'),
+                
+                // [ใหม่]
+                document.getElementById('tpaDate'),
+                document.getElementById('tpaTime')
+            ];
+
+            inputsCalc.forEach(el => {
+                if(el) {
+                    el.addEventListener('change', updateErCalculations);
+                    el.addEventListener('input', updateErCalculations); 
+                }
+            });
+
+            // --------------------------------------------------------
+            // 4. Logic อื่นๆ
+            // --------------------------------------------------------
             const radioIschemic = document.getElementById('ctResultIschemic');
             const radioHemorrhagic = document.getElementById('ctResultHemorrhagic');
             const ischemicPathway = document.getElementById('ischemicPathway');
             const hemorrhagicPathway = document.getElementById('hemorrhagicPathway');
 
-            radioIschemic.addEventListener('change', () => {
-                if (radioIschemic.checked) {
-                    ischemicPathway.classList.remove('d-none');
-                    hemorrhagicPathway.classList.add('d-none');
-                }
-            });
+            if(radioIschemic && radioHemorrhagic) {
+                radioIschemic.addEventListener('change', () => {
+                    if (radioIschemic.checked) {
+                        ischemicPathway.classList.remove('d-none');
+                        hemorrhagicPathway.classList.add('d-none');
+                    }
+                });
+                radioHemorrhagic.addEventListener('change', () => {
+                    if (radioHemorrhagic.checked) {
+                        ischemicPathway.classList.add('d-none');
+                        hemorrhagicPathway.classList.remove('d-none');
+                    }
+                });
+            }
 
-            radioHemorrhagic.addEventListener('change', () => {
-                if (radioHemorrhagic.checked) {
-                    ischemicPathway.classList.add('d-none');
-                    hemorrhagicPathway.classList.remove('d-none');
-                }
-            });
-
-            // 2. Logic บันทึกข้อมูล (AJAX)
             const saveButton = document.getElementById('saveErBtn');
             const nextButton = document.getElementById('nextStepBtn');
             const erForm = document.getElementById('erForm');
-
-            // เช็คว่ามี admission_id หรือยัง เพื่อโชว์ปุ่ม Next
-            const admissionId = document.querySelector('input[name="admission_id"]').value;
-            if (admissionId) {
+            const admissionIdInput = document.querySelector('input[name="admission_id"]');
+            
+            if (admissionIdInput && admissionIdInput.value && nextButton) {
                 nextButton.classList.remove('d-none');
             }
 
             if(saveButton) {
                 saveButton.addEventListener('click', function(e) {
                     e.preventDefault();
-
                     Swal.fire({
                         title: 'ยืนยันการบันทึก',
                         text: "ต้องการบันทึกข้อมูล ER ใช่หรือไม่?",
@@ -355,29 +534,18 @@ function dt($field, $type) {
                     }).then((result) => {
                         if (result.isConfirmed) {
                             Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
-
                             const formData = new FormData(erForm);
-
-                            fetch('save_er.php', {
-                                method: 'POST',
-                                body: formData
-                            })
+                            fetch('save_er.php', { method: 'POST', body: formData })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.status === 'success') {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'สำเร็จ!',
-                                        text: 'บันทึกข้อมูล ER เรียบร้อยแล้ว',
-                                        timer: 1500,
-                                        showConfirmButton: false
-                                    });
-
+                                    Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: 'บันทึกข้อมูลเรียบร้อย', timer: 1500, showConfirmButton: false });
                                     saveButton.classList.replace('btn-primary', 'btn-secondary');
                                     saveButton.innerHTML = '<i class="bi bi-check-lg"></i> บันทึกแล้ว';
-                                    
-                                    nextButton.classList.remove('d-none');
-                                    nextButton.href = data.redirect_url;
+                                    if(nextButton) {
+                                        nextButton.classList.remove('d-none');
+                                        nextButton.href = data.redirect_url;
+                                    }
                                 } else {
                                     Swal.fire('Error', data.message, 'error');
                                 }
@@ -390,8 +558,10 @@ function dt($field, $type) {
                     });
                 });
             }
+
+            // เรียกคำนวณครั้งแรก
+            updateErCalculations();
         });
     </script>
 </body>
-
 </html>

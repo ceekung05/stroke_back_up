@@ -17,7 +17,6 @@ function checkVal($field_name)
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // เปิด Error Reporting เพื่อช่วยหาจุดผิดพลาด
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     try {
@@ -35,6 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mt_anesthesia_datetime = combineDateTime($_POST['mt_anesthesia_date'] ?? '', $_POST['mt_anesthesia_time'] ?? '');
         $mt_puncture_datetime = combineDateTime($_POST['mt_puncture_date'] ?? '', $_POST['mt_puncture_time'] ?? '');
         $mt_recanalization_datetime = combineDateTime($_POST['mt_recanalization_date'] ?? '', $_POST['mt_recanalization_time'] ?? '');
+
+        // [ใหม่] รับค่าคำนวณ
+        $time_door_to_puncture_min = !empty($_POST['time_door_to_puncture_min']) ? $_POST['time_door_to_puncture_min'] : null;
+        $time_onset_to_recanalization_min = !empty($_POST['time_onset_to_recanalization_min']) ? $_POST['time_onset_to_recanalization_min'] : null;
 
         $mt_occlusion_vessel = $_POST['mt_occlusion_vessel'] ?? null;
         $mt_tici_score = $_POST['mt_tici_score'] ?? null;
@@ -62,15 +65,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hemo_proc_craniectomy = checkVal('hemo_proc_craniectomy');
         $hemo_proc_ventriculostomy = checkVal('hemo_proc_ventriculostomy');
 
-        // Common
         $complication_details = $_POST['complication_details'] ?? null;
-        // แก้ไข: รับชื่อผู้ใช้ให้ชัวร์
+        
         $sess_user = $_SESSION['user_data'] ?? [];
         $current_user = $sess_user['HR_FNAME'] ?? $sess_user['hr_fname'] ?? 'System';
 
         $sql = "INSERT INTO tbl_or_procedure (
                     admission_id, procedure_type,
                     mt_anesthesia_datetime, mt_puncture_datetime, mt_recanalization_datetime,
+                    time_door_to_puncture_min, time_onset_to_recanalization_min, -- เพิ่มคอลัมน์
                     mt_occlusion_vessel, mt_tici_score, mt_procedure_technique, mt_pass_count,
                     mt_med_integrilin, mt_integrilin_bolus, mt_integrilin_drip,
                     mt_med_nimodipine, mt_nimodipine_bolus, mt_nimodipine_drip,
@@ -82,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ) VALUES (
                     ?, ?,
                     ?, ?, ?,
+                    ?, ?, -- Placeholder ใหม่
                     ?, ?, ?, ?,
                     ?, ?, ?,
                     ?, ?, ?,
@@ -96,6 +100,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     mt_anesthesia_datetime = VALUES(mt_anesthesia_datetime),
                     mt_puncture_datetime = VALUES(mt_puncture_datetime),
                     mt_recanalization_datetime = VALUES(mt_recanalization_datetime),
+                    
+                    time_door_to_puncture_min = VALUES(time_door_to_puncture_min), -- Update
+                    time_onset_to_recanalization_min = VALUES(time_onset_to_recanalization_min), -- Update
+
                     mt_occlusion_vessel = VALUES(mt_occlusion_vessel),
                     mt_tici_score = VALUES(mt_tici_score),
                     mt_procedure_technique = VALUES(mt_procedure_technique),
@@ -122,16 +130,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $stmt = $conn->prepare($sql);
 
-        // *** ตรวจสอบจำนวนตัวแปรให้ตรงกับเครื่องหมาย ? ใน SQL (27 ตัว) ***
-        // i=1, s=1, sss=3, ssss=4, idd=3, idd=3, ddis=4, sd=2, iii=3, s=1, s=1, s=1 
-        // รวมทั้งหมด 27 ตัว ถูกต้อง
+        // Bind Param: isssssiissiddiddddissiiissss (29 ตัว)
+        // เพิ่ม i 2 ตัว ต่อจาก sssss (mt_recanalization_datetime)
+        
         $stmt->bind_param(
-            "issssssssiddiddddissiiissss",
+            "isssssiisssiddiddddissiiissss",
             $admission_id,
             $procedure_type,
             $mt_anesthesia_datetime,
             $mt_puncture_datetime,
             $mt_recanalization_datetime,
+            
+            $time_door_to_puncture_min,       // [ใหม่]
+            $time_onset_to_recanalization_min,// [ใหม่]
+
             $mt_occlusion_vessel,
             $mt_tici_score,
             $mt_procedure_technique,
@@ -152,8 +164,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $hemo_proc_craniectomy,
             $hemo_proc_ventriculostomy,
             $complication_details,
-            $current_user, // created_by
-            $current_user  // updated_by
+            $current_user,
+            $current_user
         );
 
         if ($stmt->execute()) {
@@ -170,3 +182,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
     }
 }
+?>

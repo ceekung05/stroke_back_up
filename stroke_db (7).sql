@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 09, 2026 at 10:37 AM
+-- Generation Time: Jan 12, 2026 at 09:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -40,29 +40,35 @@ CREATE TABLE `tbl_er` (
   `occlusion_site` varchar(100) DEFAULT NULL,
   `ct_result` enum('ischemic','hemorrhagic') DEFAULT NULL COMMENT 'ผล CT (Ischemic / Hemorrhagic)',
   `fibrinolytic_type` enum('rtpa','sk','tnk','no') DEFAULT NULL COMMENT 'Fibrinolytic',
-  `tpa_start_time` time DEFAULT NULL COMMENT 'เวลาที่เริ่มให้ยา',
+  `tpa_datetime` datetime DEFAULT NULL COMMENT 'วันเวลาเริ่มยา Fibrinolytic',
   `anesthesia_set_datetime` datetime DEFAULT NULL COMMENT 'set ดมยา',
   `activate_team_datetime` datetime DEFAULT NULL COMMENT 'Activate Team',
-  `consult_neurosurgeon` tinyint(1) DEFAULT 0 COMMENT 'ปรึกษาศัลยแพทย์ระบบประสาท',
+  `consult_neurosurgeon_datetime` datetime DEFAULT NULL COMMENT 'วันเวลาปรึกษา Neurosurgeon',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` varchar(255) DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_by` varchar(255) DEFAULT NULL
+  `updated_by` varchar(255) DEFAULT NULL,
+  `time_door_to_doctor_min` int(11) DEFAULT NULL COMMENT 'ระยะเวลา Door to Doctor (นาที)',
+  `time_door_to_ct_min` int(11) DEFAULT NULL COMMENT 'ระยะเวลา Door to CT (นาที)',
+  `time_door_to_cta_min` int(11) DEFAULT NULL COMMENT 'ระยะเวลา Door to CTA (นาที)',
+  `time_door_to_intervention_min` int(11) DEFAULT NULL COMMENT 'Door to Interventionist (นาที)',
+  `time_door_to_needle_min` int(11) DEFAULT NULL COMMENT 'Door to Needle (นาที)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ตารางลูก: เก็บข้อมูล ER (ฟอร์มที่ 2)';
 
 --
 -- Dumping data for table `tbl_er`
 --
 
-INSERT INTO `tbl_er` (`id`, `admission_id`, `consult_neuro_datetime`, `ctnc_datetime`, `cta_datetime`, `mri_datetime`, `consult_intervention_datetime`, `aspect_score`, `collateral_score`, `occlusion_site`, `ct_result`, `fibrinolytic_type`, `tpa_start_time`, `anesthesia_set_datetime`, `activate_team_datetime`, `consult_neurosurgeon`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES
-(1, 9, '2025-11-21 10:30:00', '2025-11-21 10:35:00', '2025-11-21 10:40:00', '2025-11-21 10:45:00', '2025-11-21 10:50:00', 7, 3, 'Right M2 of MCA', 'ischemic', 'tnk', '10:57:00', '2025-11-21 11:00:00', '2025-11-21 11:10:00', 0, '2025-11-21 03:27:30', 'System', '2025-11-21 03:27:30', NULL),
-(2, 8, '2025-12-06 13:47:00', '2025-11-21 13:47:00', '2025-11-21 13:46:00', '2025-11-21 13:49:00', '2025-11-21 16:04:00', 4, 3, 'Right ACA', 'hemorrhagic', NULL, '00:00:00', NULL, NULL, 1, '2025-11-21 06:45:45', 'System', '2025-11-21 06:45:45', NULL),
-(3, 10, '2025-11-21 16:31:00', '2025-11-22 18:31:00', '2025-11-22 16:32:00', '2025-11-23 16:36:00', '2025-11-26 16:35:00', 7, 3, 'Right Beyond M2 of MCA', 'ischemic', 'sk', '16:34:00', '2025-11-22 16:35:00', '2025-11-12 16:37:00', 0, '2025-11-21 09:32:56', 'System', '2025-11-21 09:32:56', NULL),
-(4, 11, '2025-12-04 15:24:00', '2025-12-04 14:22:00', '2025-12-04 14:33:00', '2025-12-04 14:33:00', '2025-12-04 14:37:00', 4, 4, 'Left ACA', 'ischemic', 'rtpa', '14:19:00', '2025-12-04 14:21:00', '2025-12-05 14:21:00', 0, '2025-12-04 07:18:59', 'System', '2025-12-04 07:18:59', NULL),
-(5, 56, '2025-12-22 14:58:00', '2025-12-22 14:00:00', '2025-12-22 17:54:00', '2025-12-22 14:56:00', '2025-12-22 14:57:00', 3, 3, 'Left PCA', 'ischemic', 'sk', '14:58:00', '2025-12-22 14:00:00', '2025-12-12 14:59:00', 0, '2025-12-22 08:01:10', 'System', '2025-12-22 08:01:10', 'System'),
-(6, 57, '2025-12-24 11:31:00', '2025-12-24 11:31:00', '2025-12-24 11:32:00', '2025-12-01 11:29:00', '2025-12-24 11:31:00', 6, 3, 'Left Beyond M2 of MCA', 'hemorrhagic', NULL, '00:00:00', NULL, NULL, 1, '2025-12-24 04:29:44', 'System', '2025-12-24 04:29:44', 'System'),
-(7, 60, '2025-12-29 00:23:00', '2025-12-29 11:25:00', '2025-12-29 11:25:00', '2025-12-29 11:28:00', '2025-12-29 01:24:00', 4, 3, 'Left ACA', 'hemorrhagic', NULL, '00:00:00', NULL, NULL, 1, '2025-12-29 04:24:10', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:24:10', 'สุขใจ (ทดสอบ) ซ่อมไว'),
-(8, 62, '2026-01-09 14:48:00', '2026-01-09 14:48:00', '2026-01-09 14:51:00', '2026-01-09 17:48:00', '2026-01-09 14:51:00', 3, 1, 'Right Beyond M2 of MCA', 'hemorrhagic', NULL, '00:00:00', NULL, NULL, 1, '2026-01-09 07:49:07', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 07:49:07', 'สุขใจ (ทดสอบ) ซ่อมไว');
+INSERT INTO `tbl_er` (`id`, `admission_id`, `consult_neuro_datetime`, `ctnc_datetime`, `cta_datetime`, `mri_datetime`, `consult_intervention_datetime`, `aspect_score`, `collateral_score`, `occlusion_site`, `ct_result`, `fibrinolytic_type`, `tpa_datetime`, `anesthesia_set_datetime`, `activate_team_datetime`, `consult_neurosurgeon_datetime`, `created_at`, `created_by`, `updated_at`, `updated_by`, `time_door_to_doctor_min`, `time_door_to_ct_min`, `time_door_to_cta_min`, `time_door_to_intervention_min`, `time_door_to_needle_min`) VALUES
+(1, 9, '2025-11-21 10:30:00', '2025-11-21 10:35:00', '2025-11-21 10:40:00', '2025-11-21 10:45:00', '2025-11-21 10:50:00', 7, 3, 'Right M2 of MCA', 'ischemic', 'tnk', '2026-01-12 10:57:00', '2025-11-21 11:00:00', '2025-11-21 11:10:00', '0000-00-00 00:00:00', '2025-11-21 03:27:30', 'System', '2025-11-21 03:27:30', NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 8, '2025-12-06 13:47:00', '2025-11-21 13:47:00', '2025-11-21 13:46:00', '2025-11-21 13:49:00', '2025-11-21 16:04:00', 4, 3, 'Right ACA', 'hemorrhagic', NULL, '2026-01-12 00:00:00', NULL, NULL, '0000-00-00 00:00:00', '2025-11-21 06:45:45', 'System', '2025-11-21 06:45:45', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 10, '2025-11-21 16:31:00', '2025-11-22 18:31:00', '2025-11-22 16:32:00', '2025-11-23 16:36:00', '2025-11-26 16:35:00', 7, 3, 'Right Beyond M2 of MCA', 'ischemic', 'sk', '2026-01-12 16:34:00', '2025-11-22 16:35:00', '2025-11-12 16:37:00', '0000-00-00 00:00:00', '2025-11-21 09:32:56', 'System', '2025-11-21 09:32:56', NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 11, '2025-12-04 15:24:00', '2025-12-04 14:22:00', '2025-12-04 14:33:00', '2025-12-04 14:33:00', '2025-12-04 14:37:00', 4, 4, 'Left ACA', 'ischemic', 'rtpa', '2026-01-12 14:19:00', '2025-12-04 14:21:00', '2025-12-05 14:21:00', '0000-00-00 00:00:00', '2025-12-04 07:18:59', 'System', '2025-12-04 07:18:59', NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 56, '2025-12-22 14:58:00', '2025-12-22 14:00:00', '2025-12-22 17:54:00', '2025-12-22 14:56:00', '2025-12-22 14:57:00', 3, 3, 'Left PCA', 'ischemic', 'sk', '2026-01-12 14:58:00', '2025-12-22 14:00:00', '2025-12-12 14:59:00', '0000-00-00 00:00:00', '2025-12-22 08:01:10', 'System', '2025-12-22 08:01:10', 'System', NULL, NULL, NULL, NULL, NULL),
+(6, 57, '2025-12-24 11:31:00', '2025-12-24 11:31:00', '2025-12-24 11:32:00', '2025-12-01 11:29:00', '2025-12-24 11:31:00', 6, 3, 'Left Beyond M2 of MCA', 'hemorrhagic', NULL, '2026-01-12 00:00:00', NULL, NULL, '0000-00-00 00:00:00', '2025-12-24 04:29:44', 'System', '2025-12-24 04:29:44', 'System', NULL, NULL, NULL, NULL, NULL),
+(7, 60, '2025-12-29 00:23:00', '2025-12-29 11:25:00', '2025-12-29 11:25:00', '2025-12-29 11:28:00', '2025-12-29 01:24:00', 4, 3, 'Left ACA', 'hemorrhagic', NULL, '2026-01-12 00:00:00', NULL, NULL, '0000-00-00 00:00:00', '2025-12-29 04:24:10', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:24:10', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, NULL, NULL, NULL, NULL),
+(8, 62, '2026-01-09 14:48:00', '2026-01-09 14:48:00', '2026-01-09 14:51:00', '2026-01-09 17:48:00', '2026-01-09 14:51:00', 3, 1, 'Right Beyond M2 of MCA', 'hemorrhagic', NULL, '2026-01-12 00:00:00', NULL, NULL, '0000-00-00 00:00:00', '2026-01-09 07:49:07', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 07:49:07', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, NULL, NULL, NULL, NULL),
+(9, 67, '2026-01-12 11:50:00', '2026-01-12 12:00:00', '2026-01-12 12:32:00', '2026-01-12 12:40:00', '2026-01-12 11:50:00', 4, 2, 'Left PCA', 'ischemic', 'no', '2026-01-12 12:50:00', '2026-01-12 13:05:00', '2026-01-12 13:15:00', '2026-01-12 14:32:00', '2026-01-12 03:52:15', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:27:39', '0', 10, 20, 52, 10, 70);
 
 -- --------------------------------------------------------
 
@@ -115,7 +121,15 @@ INSERT INTO `tbl_followup` (`id`, `admission_id`, `followup_label`, `scheduled_d
 (29, 60, 'mRS 1 เดือน', '2026-01-29', 'pending', NULL, '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว'),
 (30, 60, 'mRS 3 เดือน', '2026-03-29', 'pending', NULL, '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว'),
 (31, 60, 'mRS 6 เดือน', '2026-06-29', 'pending', NULL, '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว'),
-(32, 60, 'mRS 12 เดือน', '2026-12-29', 'pending', NULL, '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว');
+(32, 60, 'mRS 12 เดือน', '2026-12-29', 'pending', NULL, '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:29:12', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(33, 67, 'mRS 1 เดือน', '2026-02-12', 'pending', NULL, '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(34, 67, 'mRS 3 เดือน', '2026-04-12', 'pending', NULL, '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(35, 67, 'mRS 6 เดือน', '2026-07-12', 'pending', NULL, '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(36, 67, 'mRS 12 เดือน', '2027-01-12', 'pending', NULL, '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:02:36', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(37, 62, 'mRS 1 เดือน', '2026-02-12', 'pending', NULL, '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(38, 62, 'mRS 3 เดือน', '2026-04-12', 'pending', NULL, '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(39, 62, 'mRS 6 เดือน', '2026-07-12', 'pending', NULL, '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(40, 62, 'mRS 12 เดือน', '2027-01-12', 'pending', NULL, '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:11:31', 'สุขใจ (ทดสอบ) ซ่อมไว');
 
 -- --------------------------------------------------------
 
@@ -153,21 +167,25 @@ CREATE TABLE `tbl_or_procedure` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` varchar(255) DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_by` varchar(255) DEFAULT NULL
+  `updated_by` varchar(255) DEFAULT NULL,
+  `time_door_to_puncture_min` int(11) DEFAULT NULL COMMENT 'Door to Puncture (นาที)',
+  `time_onset_to_recanalization_min` int(11) DEFAULT NULL COMMENT 'Onset to Recanalization (นาที)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ตารางลูก: เก็บข้อมูลหัตถการ (ฟอร์มที่ 3)';
 
 --
 -- Dumping data for table `tbl_or_procedure`
 --
 
-INSERT INTO `tbl_or_procedure` (`id`, `admission_id`, `procedure_type`, `mt_anesthesia_datetime`, `mt_puncture_datetime`, `mt_recanalization_datetime`, `mt_occlusion_vessel`, `mt_tici_score`, `mt_procedure_technique`, `mt_pass_count`, `mt_med_integrilin`, `mt_integrilin_bolus`, `mt_integrilin_drip`, `mt_med_nimodipine`, `mt_nimodipine_bolus`, `mt_nimodipine_drip`, `mt_xray_dose`, `mt_flu_time`, `mt_cone_beam_ct`, `mt_cone_beam_ct_details`, `hemo_location`, `hemo_volume_cc`, `hemo_proc_craniotomy`, `hemo_proc_craniectomy`, `hemo_proc_ventriculostomy`, `complication_details`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES
-(1, 9, 'mt', '2025-11-21 11:38:00', '2025-11-21 11:42:00', '2025-11-21 11:48:00', 'Left ACA', '1', 'aspiration alone', 10, 1, 2.00, 1.00, 1, 5.00, 4.00, 120.00, 220.00, 1, 'test11', '', 0.00, 0, 0, 0, 'ไม่มีภาวะแทรกซ้อน', '2025-11-21 04:09:32', 'System', '2025-11-21 04:38:23', '0'),
-(8, 8, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'xfxxff', 500.00, 1, 1, 1, 'การบาดเจ็บต่อหลอดเลือด เช่น ทะลุ ฉีดขาด', '2025-11-21 06:46:44', 'System', '2025-11-21 06:46:44', '0'),
-(9, 56, 'mt', '2025-12-23 14:05:00', '2025-12-23 14:06:00', '2025-12-23 14:07:00', 'Left ICA', '2a', 'aspiration alone', 3, 1, 23.00, 12.00, 0, 0.00, 0.00, 2223.00, 999.99, 1, 'test222', 'retetwte', 22.00, 0, 0, 1, 'ไม่มีภาวะแทรกซ้อน', '2025-12-23 07:08:27', 'System', '2025-12-24 04:12:40', 'System'),
-(11, 57, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'test221', 2.00, 0, 0, 1, 'มีภาวะเลือดออกในสมอง', '2025-12-25 08:01:29', 'System', '2025-12-25 08:01:29', 'System'),
-(12, 11, 'mt', '2025-12-25 15:09:00', '2025-12-25 15:11:00', '2025-12-25 15:09:00', 'Left ICA', '1', 'aspiration alone', 1, 1, 2.00, 2.00, 0, 0.00, 0.00, 22.00, 33.00, 0, '', '', 0.00, 0, 0, 0, 'มีภาวะเลือดออกในสมอง', '2025-12-25 08:09:20', 'System', '2025-12-25 08:09:20', 'System'),
-(13, 10, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'ไไำไ', 3231.00, 0, 0, 1, 'ไม่มีภาวะแทรกซ้อน', '2025-12-25 08:21:31', 'System', '2025-12-25 08:21:31', 'System'),
-(14, 60, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'กกก', 2.00, 0, 0, 1, 'การบาดเจ็บต่อหลอดเลือด เช่น ทะลุ ฉีดขาด', '2025-12-29 04:25:46', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:25:46', 'สุขใจ (ทดสอบ) ซ่อมไว');
+INSERT INTO `tbl_or_procedure` (`id`, `admission_id`, `procedure_type`, `mt_anesthesia_datetime`, `mt_puncture_datetime`, `mt_recanalization_datetime`, `mt_occlusion_vessel`, `mt_tici_score`, `mt_procedure_technique`, `mt_pass_count`, `mt_med_integrilin`, `mt_integrilin_bolus`, `mt_integrilin_drip`, `mt_med_nimodipine`, `mt_nimodipine_bolus`, `mt_nimodipine_drip`, `mt_xray_dose`, `mt_flu_time`, `mt_cone_beam_ct`, `mt_cone_beam_ct_details`, `hemo_location`, `hemo_volume_cc`, `hemo_proc_craniotomy`, `hemo_proc_craniectomy`, `hemo_proc_ventriculostomy`, `complication_details`, `created_at`, `created_by`, `updated_at`, `updated_by`, `time_door_to_puncture_min`, `time_onset_to_recanalization_min`) VALUES
+(1, 9, 'mt', '2025-11-21 11:38:00', '2025-11-21 11:42:00', '2025-11-21 11:48:00', 'Left ACA', '1', 'aspiration alone', 10, 1, 2.00, 1.00, 1, 5.00, 4.00, 120.00, 220.00, 1, 'test11', '', 0.00, 0, 0, 0, 'ไม่มีภาวะแทรกซ้อน', '2025-11-21 04:09:32', 'System', '2025-11-21 04:38:23', '0', NULL, NULL),
+(8, 8, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'xfxxff', 500.00, 1, 1, 1, 'การบาดเจ็บต่อหลอดเลือด เช่น ทะลุ ฉีดขาด', '2025-11-21 06:46:44', 'System', '2025-11-21 06:46:44', '0', NULL, NULL),
+(9, 56, 'mt', '2025-12-23 14:05:00', '2025-12-23 14:06:00', '2025-12-23 14:07:00', 'Left ICA', '2a', 'aspiration alone', 3, 1, 23.00, 12.00, 0, 0.00, 0.00, 2223.00, 999.99, 1, 'test222', 'retetwte', 22.00, 0, 0, 1, 'ไม่มีภาวะแทรกซ้อน', '2025-12-23 07:08:27', 'System', '2025-12-24 04:12:40', 'System', NULL, NULL),
+(11, 57, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'test221', 2.00, 0, 0, 1, 'มีภาวะเลือดออกในสมอง', '2025-12-25 08:01:29', 'System', '2025-12-25 08:01:29', 'System', NULL, NULL),
+(12, 11, 'mt', '2025-12-25 15:09:00', '2025-12-25 15:11:00', '2025-12-25 15:09:00', 'Left ICA', '1', 'aspiration alone', 1, 1, 2.00, 2.00, 0, 0.00, 0.00, 22.00, 33.00, 0, '', '', 0.00, 0, 0, 0, 'มีภาวะเลือดออกในสมอง', '2025-12-25 08:09:20', 'System', '2025-12-25 08:09:20', 'System', NULL, NULL),
+(13, 10, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'ไไำไ', 3231.00, 0, 0, 1, 'ไม่มีภาวะแทรกซ้อน', '2025-12-25 08:21:31', 'System', '2025-12-25 08:21:31', 'System', NULL, NULL),
+(14, 60, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'กกก', 2.00, 0, 0, 1, 'การบาดเจ็บต่อหลอดเลือด เช่น ทะลุ ฉีดขาด', '2025-12-29 04:25:46', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:25:46', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, NULL),
+(15, 67, 'mt', '2026-01-12 13:25:00', '2026-01-12 13:54:00', '2026-01-12 13:59:00', '0', '1', 'aspiration alone', 1, 0, 0.00, 0.00, 1, 23.00, 12.00, 25.00, 3.00, 1, 'ะำหะ', 'testtest', 12.00, 1, 1, 0, 'มีภาวะเลือดออกในสมอง', '2026-01-12 03:56:02', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:34:14', 'สุขใจ (ทดสอบ) ซ่อมไว', 134, 209),
+(16, 62, 'hemo', NULL, NULL, NULL, 'Left ICA', '0', 'aspiration alone', 1, 0, 0.00, 0.00, 0, 0.00, 0.00, 0.00, 0.00, 0, '', 'dff', 342.00, 0, 1, 0, 'การบาดเจ็บต่อหลอดเลือด เช่น ทะลุ ฉีดขาด', '2026-01-12 07:03:13', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:03:13', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -232,6 +250,7 @@ INSERT INTO `tbl_patient` (`hn`, `id_card`, `flname`, `birthdate`, `age`, `gende
 ('2/69', '1800400177511', 'นายอภินันท์ ธนากรรฐ์', '1991-08-18', 34, 'ชาย', 'AB', NULL, '32 ถ.ถัดอุทิศ ต.หาดใหญ่ อ.หาดใหญ่ จ.สงขลา 90110', NULL, NULL, 'self_pay', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-08 06:11:46', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-08 06:11:46'),
 ('20/69', '3900900579575', 'นายบุญธรรม อุไรรัตน์', '1957-08-17', 68, 'ชาย', 'X', NULL, '114/1 ต.รัตภูมิ อ.ควนเนียง จ.สงขลา ', NULL, NULL, 'self_pay', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-08 08:37:38', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:13:20'),
 ('21/69', '1940101260733', 'น.ส.เจ๊ะกอลีเยาะ มูซอ', '2001-02-01', 24, 'หญิง', 'A', NULL, '245/2 ม.5 ต.เขื่อนบางลาง อ.บันนังสตา จ.ยะลา ', NULL, NULL, 'self_pay', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:37:04', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:37:04'),
+('22/69', '1959900957857', 'นายสาลามิน วาโด', '2005-10-15', 20, 'หญิง', 'AB', NULL, 'รับมาจาก ถ.ทุ่งเสา 2 ต.ทุ่งตำเสา อ.หาดใหญ่ จ.สงขลา 90110', NULL, NULL, 'self_pay', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 03:37:03', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 03:37:03'),
 ('3/49', '3100200135922', 'นายปานเพชร ใจทอง', '1972-01-02', 38, 'ชาย', 'A', NULL, '2/47 ถ.หน้าสถานี ต.หาดใหญ่ อ.หาดใหญ่ จ.สงขลา ', NULL, NULL, 'social_security', 'System', '2025-12-19 04:16:44', NULL, '2025-12-19 04:16:44'),
 ('3/69', '2900800006958', 'น.ส.ศุภลักษณ์ เอียดแก้ว', '1996-10-10', 29, 'หญิง', 'O', NULL, '69 ม.3 ต.โรง อ.กระแสสิน จ.สงขลา ', NULL, NULL, 'self_pay', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-08 06:39:56', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-08 06:39:56'),
 ('4/49', '3900400043099', 'นางบุญ ทองบุญ', '1916-11-30', 103, 'หญิง', 'O', NULL, '7 ม.4 ต.ท่าประดู่ อ.นาทวี จ.สงขลา ', NULL, NULL, 'self_pay', 'System', '2025-12-19 04:23:50', 'System', '2025-12-19 04:27:36'),
@@ -373,7 +392,8 @@ INSERT INTO `tbl_stroke_admission` (`id`, `patient_hn`, `is_ht`, `is_dm`, `is_ol
 (63, '16/69', 0, 0, 0, 0, 1, 0, '', 0, 0, 1, 0, 0, 0, 'refer', 'รพช.นาโยง', '2026-01-09 15:00:00', '2026-01-09 14:30:00', NULL, NULL, NULL, NULL, 1, 0, 1, 1, 0, 0, 0, 0, 3, 'no', 1, 0, 0, 0, 0, 0, 1, 2, 3, 16, '2026-01-09 14:49:00', '2026-01-09 15:00:00', '2026-01-09 08:00:18', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 08:00:18', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, NULL, NULL, NULL),
 (64, '18/69', 0, 0, 0, 0, 1, 0, '', 0, 0, 0, 0, 0, 1, 'walk_in', '', NULL, NULL, NULL, '2026-01-09 16:04:00', NULL, NULL, 1, 0, 1, 1, 0, 0, 0, 0, 2, '', 0, 1, 0, 0, 0, 0, 1, 2, 1, NULL, '2026-01-09 16:05:00', '2026-01-09 16:04:00', '2026-01-09 09:03:32', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:03:32', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, -1, NULL, NULL),
 (65, '20/69', 0, 0, 0, 0, 1, 1, '', 0, 0, 0, 1, 1, 0, 'ems', '', NULL, NULL, '2026-01-09 16:12:00', NULL, NULL, NULL, 1, 0, 1, 1, 0, 0, 0, 0, 3, '', 1, 0, 1, 0, 0, 0, 3, 1, 5, 41, '2026-01-09 16:02:00', '2026-01-09 16:13:00', '2026-01-09 09:13:20', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:13:20', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL, 10, NULL, NULL),
-(66, '21/69', 0, 0, 0, 0, 0, 1, '', 0, 0, 0, 1, 0, 0, 'refer', 'รพช.สะเดา', NULL, '2026-01-09 08:30:00', NULL, NULL, NULL, NULL, 1, 0, 1, 1, 0, 0, 0, 0, 1, '', 0, 0, 1, 0, 0, 0, 2, 3, NULL, 25, '2026-01-09 16:36:00', '2026-01-09 10:00:00', '2026-01-09 09:37:04', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:37:04', 'สุขใจ (ทดสอบ) ซ่อมไว', -486, -516, NULL, NULL);
+(66, '21/69', 0, 0, 0, 0, 0, 1, '', 0, 0, 0, 1, 0, 0, 'refer', 'รพช.สะเดา', NULL, '2026-01-09 08:30:00', NULL, NULL, NULL, NULL, 1, 0, 1, 1, 0, 0, 0, 0, 1, '', 0, 0, 1, 0, 0, 0, 2, 3, NULL, 25, '2026-01-09 16:36:00', '2026-01-09 10:00:00', '2026-01-09 09:37:04', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-09 09:37:04', 'สุขใจ (ทดสอบ) ซ่อมไว', -486, -516, NULL, NULL),
+(67, '22/69', 0, 0, 0, 0, 1, 0, '', 0, 0, 1, 1, 1, 1, 'refer', 'รพศ.ตรัง', '2026-01-12 10:35:00', '2026-01-12 11:40:00', NULL, NULL, NULL, NULL, 1, 0, 0, 0, 1, 0, 0, 0, 2, '', 1, 0, 0, 0, 0, 0, 1, 2, 3, 12, '2026-01-12 10:30:00', '2026-01-12 11:40:00', '2026-01-12 03:37:03', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 03:37:03', 'สุขใจ (ทดสอบ) ซ่อมไว', 70, 70, -65, 65);
 
 -- --------------------------------------------------------
 
@@ -403,7 +423,7 @@ CREATE TABLE `tbl_user` (
 
 INSERT INTO `tbl_user` (`id`, `hr_fname`, `hr_cid`, `password`, `position_in_work`, `department_name`, `hr_department_sub_name`, `hr_department_sub_sub_name`, `created_at`, `created_by`, `updated_at`, `updated_by`, `last_login`) VALUES
 (1, 'พิชัย จินดาประเสริฐ', '3333333333332', NULL, 'นักศึกษาฝึกงาน', 'ภารกิจสุขภาพดิจิทัล', 'กลุ่มงานเทคโนโลยีสารสนเทศ', 'งานเทคโนโลยีสารสนเทศ', '2025-10-28 04:49:08', 'admin', '2025-10-28 04:49:08', '[value-11]', NULL),
-(2, 'สุขใจ (ทดสอบ) ซ่อมไว', '2222222222223', NULL, 'นักวิชาการคอมพิวเตอร์', 'ภารกิจสุขภาพดิจิทัล', 'กลุ่มงานเทคโนโลยีสารสนเทศ', 'งานเทคโนโลยีสารสนเทศ', '2025-10-28 06:59:18', '2222222222223', '2026-01-09 07:05:00', '2222222222223', '2026-01-09 07:05:00'),
+(2, 'สุขใจ (ทดสอบ) ซ่อมไว', '2222222222223', NULL, 'นักวิชาการคอมพิวเตอร์', 'ภารกิจสุขภาพดิจิทัล', 'กลุ่มงานเทคโนโลยีสารสนเทศ', 'งานเทคโนโลยีสารสนเทศ', '2025-10-28 06:59:18', '2222222222223', '2026-01-12 02:15:06', '2222222222223', '2026-01-12 02:15:06'),
 (36, 'ฟาดีฟ สาและ', '1959900398475', NULL, 'นักวิชาการคอมพิวเตอร์', 'ภารกิจสุขภาพดิจิทัล', 'กลุ่มงานสุขภาพดิจิทัล', 'กลุ่มงานสุขภาพดิจิทัล', '2025-11-05 02:35:21', '1959900398475', NULL, NULL, '2025-11-05 02:35:21');
 
 -- --------------------------------------------------------
@@ -420,7 +440,6 @@ CREATE TABLE `tbl_ward` (
   `discharge_assess_datetime` datetime DEFAULT NULL COMMENT 'อาการก่อนจำหน่ายประจำวันที่',
   `discharge_mrs` tinyint(4) DEFAULT NULL COMMENT 'mRS (ณ วันจำหน่าย)',
   `discharge_barthel` tinyint(4) DEFAULT NULL COMMENT 'Barthel Index',
-  `discharge_hrs` tinyint(4) DEFAULT NULL COMMENT 'HRS',
   `discharge_plan_status` enum('came','not_came') DEFAULT NULL COMMENT 'การวางแผนจำหน่าย มา/ไม่มา',
   `discharge_date` date DEFAULT NULL COMMENT 'มา วันที่:',
   `discharge_status` enum('recovery','improve','disability','refer','against','death') DEFAULT NULL COMMENT 'สถานะจำหน่าย',
@@ -430,21 +449,24 @@ CREATE TABLE `tbl_ward` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` varchar(255) DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updated_by` varchar(255) DEFAULT NULL
+  `updated_by` varchar(255) DEFAULT NULL,
+  `discharge_type` varchar(50) DEFAULT NULL COMMENT 'ประเภทการจำหน่าย (Approval, Refer, Against, Death)'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ตารางลูก 1:1 เก็บข้อมูลสรุป Ward และการจำหน่าย';
 
 --
 -- Dumping data for table `tbl_ward`
 --
 
-INSERT INTO `tbl_ward` (`id`, `admission_id`, `followup_ct_datetime`, `followup_ct_result`, `discharge_assess_datetime`, `discharge_mrs`, `discharge_barthel`, `discharge_hrs`, `discharge_plan_status`, `discharge_date`, `discharge_status`, `first_followup_date`, `discharge_destination`, `refer_name_hospital`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES
-(1, 9, '2025-11-21 11:43:00', 'ืnxxxn', '2025-11-21 11:59:00', 3, 20, 5, 'came', '2025-11-21', 'recovery', '2025-11-20', 'home', NULL, '2025-11-21 04:42:46', 'System', '2025-11-21 06:43:42', '0'),
-(3, 8, '2025-11-21 13:55:00', '2223', '2025-11-21 13:57:00', 3, 127, 1, 'not_came', '0000-00-00', 'disability', '2025-11-23', 'refer', NULL, '2025-11-21 06:53:40', 'System', '2025-11-21 06:54:26', '0'),
-(4, 56, '2025-12-23 14:15:00', 'ปปปป', '2025-12-23 14:14:00', 4, 12, 22, 'came', '2025-12-24', 'improve', '2025-12-23', 'home', NULL, '2025-12-23 07:12:21', 'System', '2025-12-23 07:12:40', 'System'),
-(5, 57, '2025-12-25 15:03:00', 'xxx', '2025-12-25 15:03:00', 2, 127, 25, 'not_came', '0000-00-00', 'disability', '2025-12-25', 'home', NULL, '2025-12-25 08:02:41', 'System', '2025-12-25 08:02:51', 'System'),
-(6, 11, '2025-12-25 15:10:00', 'we33', '2025-12-25 15:11:00', 2, 127, 127, 'not_came', '0000-00-00', 'recovery', '2025-12-25', 'home', NULL, '2025-12-25 08:09:58', 'System', '2025-12-25 08:10:05', 'System'),
-(7, 10, '2025-12-25 15:23:00', 'ree', '2025-12-25 15:22:00', 4, 127, 127, 'not_came', '0000-00-00', 'recovery', '2025-12-25', 'home', NULL, '2025-12-25 08:21:58', 'System', '2025-12-25 08:22:11', 'System'),
-(8, 60, '2025-12-29 11:30:00', '22', '2025-12-29 11:30:00', 3, 21, 21, 'came', '2025-12-29', 'recovery', '2025-12-29', 'refer', NULL, '2025-12-29 04:27:42', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:28:44', 'สุขใจ (ทดสอบ) ซ่อมไว');
+INSERT INTO `tbl_ward` (`id`, `admission_id`, `followup_ct_datetime`, `followup_ct_result`, `discharge_assess_datetime`, `discharge_mrs`, `discharge_barthel`, `discharge_plan_status`, `discharge_date`, `discharge_status`, `first_followup_date`, `discharge_destination`, `refer_name_hospital`, `created_at`, `created_by`, `updated_at`, `updated_by`, `discharge_type`) VALUES
+(1, 9, '2025-11-21 11:43:00', 'ืnxxxn', '2025-11-21 11:59:00', 3, 20, 'came', '2025-11-21', 'recovery', '2025-11-20', 'home', NULL, '2025-11-21 04:42:46', 'System', '2025-11-21 06:43:42', '0', NULL),
+(3, 8, '2025-11-21 13:55:00', '2223', '2025-11-21 13:57:00', 3, 127, 'not_came', '0000-00-00', 'disability', '2025-11-23', 'refer', NULL, '2025-11-21 06:53:40', 'System', '2025-11-21 06:54:26', '0', NULL),
+(4, 56, '2025-12-23 14:15:00', 'ปปปป', '2025-12-23 14:14:00', 4, 12, 'came', '2025-12-24', 'improve', '2025-12-23', 'home', NULL, '2025-12-23 07:12:21', 'System', '2025-12-23 07:12:40', 'System', NULL),
+(5, 57, '2025-12-25 15:03:00', 'xxx', '2025-12-25 15:03:00', 2, 127, 'not_came', '0000-00-00', 'disability', '2025-12-25', 'home', NULL, '2025-12-25 08:02:41', 'System', '2025-12-25 08:02:51', 'System', NULL),
+(6, 11, '2025-12-25 15:10:00', 'we33', '2025-12-25 15:11:00', 2, 127, 'not_came', '0000-00-00', 'recovery', '2025-12-25', 'home', NULL, '2025-12-25 08:09:58', 'System', '2025-12-25 08:10:05', 'System', NULL),
+(7, 10, '2025-12-25 15:23:00', 'ree', '2025-12-25 15:22:00', 4, 127, 'not_came', '0000-00-00', 'recovery', '2025-12-25', 'home', NULL, '2025-12-25 08:21:58', 'System', '2025-12-25 08:22:11', 'System', NULL),
+(8, 60, '2025-12-29 11:30:00', '22', '2025-12-29 11:30:00', 3, 21, 'came', '2025-12-29', 'recovery', '2025-12-29', 'refer', NULL, '2025-12-29 04:27:42', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:28:44', 'สุขใจ (ทดสอบ) ซ่อมไว', NULL),
+(9, 67, '2026-01-12 12:50:00', 'test', '2026-01-12 13:25:00', 3, 4, 'came', '2026-01-12', 'improve', '2026-01-12', 'refer', NULL, '2026-01-12 04:12:49', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 06:57:13', 'สุขใจ (ทดสอบ) ซ่อมไว', 'approval'),
+(11, 62, '2026-01-12 12:00:00', 'erw', '2026-01-12 12:43:00', 2, 127, NULL, NULL, NULL, '2026-01-12', 'refer', 'test11', '2026-01-12 07:03:46', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:11:24', 'สุขใจ (ทดสอบ) ซ่อมไว', 'approval');
 
 -- --------------------------------------------------------
 
@@ -479,7 +501,9 @@ INSERT INTO `tbl_ward_monitoring` (`id`, `admission_id`, `record_datetime`, `sbp
 (6, 57, '2025-12-25 09:01:00', 25, 21, 15, '222', '2025-12-25 08:02:10', 'System', '2025-12-25 08:02:10', 'System'),
 (7, 11, '2025-12-25 09:09:00', 33, 22, 32, 'e3', '2025-12-25 08:09:32', 'System', '2025-12-25 08:09:32', 'System'),
 (8, 10, '2025-12-25 09:21:00', 231, 231, 23, '2', '2025-12-25 08:21:39', 'System', '2025-12-25 08:21:39', 'System'),
-(9, 60, '2025-12-29 05:25:00', 22, 11, 24, 'E5', '2025-12-29 04:27:00', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:27:00', 'สุขใจ (ทดสอบ) ซ่อมไว');
+(9, 60, '2025-12-29 05:25:00', 22, 11, 24, 'E5', '2025-12-29 04:27:00', 'สุขใจ (ทดสอบ) ซ่อมไว', '2025-12-29 04:27:00', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(10, 67, '2026-01-12 14:04:00', 25, 23, 13, '45', '2026-01-12 04:11:19', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 04:11:19', 'สุขใจ (ทดสอบ) ซ่อมไว'),
+(11, 62, '2026-01-12 08:03:00', 22, 343, 34, '343', '2026-01-12 07:03:24', 'สุขใจ (ทดสอบ) ซ่อมไว', '2026-01-12 07:03:24', 'สุขใจ (ทดสอบ) ซ่อมไว');
 
 --
 -- Indexes for dumped tables
@@ -549,43 +573,43 @@ ALTER TABLE `tbl_ward_monitoring`
 -- AUTO_INCREMENT for table `tbl_er`
 --
 ALTER TABLE `tbl_er`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tbl_followup`
 --
 ALTER TABLE `tbl_followup`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `tbl_or_procedure`
 --
 ALTER TABLE `tbl_or_procedure`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tbl_stroke_admission`
 --
 ALTER TABLE `tbl_stroke_admission`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=68;
 
 --
 -- AUTO_INCREMENT for table `tbl_user`
 --
 ALTER TABLE `tbl_user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=96;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=97;
 
 --
 -- AUTO_INCREMENT for table `tbl_ward`
 --
 ALTER TABLE `tbl_ward`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbl_ward_monitoring`
 --
 ALTER TABLE `tbl_ward_monitoring`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables

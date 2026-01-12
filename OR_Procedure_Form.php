@@ -10,40 +10,42 @@ $user = $_SESSION['user_data'];
 
 // --- ส่วนดึงข้อมูลเก่า (Edit Mode) ---
 $admission_id = $_GET['admission_id'] ?? '';
-$row = []; // ตัวแปรเก็บข้อมูล
+$row = []; 
+$hospital_arrival_datetime = ""; // ตัวแปรสำหรับ Door to...
+$onset_datetime = "";            // ตัวแปรสำหรับ Onset to...
 
 if ($admission_id) {
+    // 1. ดึงข้อมูล OR Procedure
     $sql = "SELECT * FROM tbl_or_procedure WHERE admission_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $admission_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
+
+    // 2. ดึงข้อมูล Arrival และ Onset จากตารางหลัก (เพื่อใช้คำนวณ)
+    $sql_adm = "SELECT hospital_arrival_datetime, onset_datetime FROM tbl_stroke_admission WHERE id = ?";
+    $stmt_adm = $conn->prepare($sql_adm);
+    $stmt_adm->bind_param("i", $admission_id);
+    $stmt_adm->execute();
+    $res_adm = $stmt_adm->get_result();
+    $row_adm = $res_adm->fetch_assoc();
+    if($row_adm) {
+        $hospital_arrival_datetime = $row_adm['hospital_arrival_datetime'];
+        $onset_datetime = $row_adm['onset_datetime'];
+    }
 }
 
 // --- ฟังก์ชันช่วยแสดงผล ---
-function val($field)
-{
-    global $row;
-    return htmlspecialchars($row[$field] ?? '');
-}
-function chk($field, $value = 1)
-{
-    global $row;
-    return (isset($row[$field]) && $row[$field] == $value) ? 'checked' : '';
-}
-function sel($field, $value)
-{
-    global $row;
-    return (isset($row[$field]) && $row[$field] == $value) ? 'selected' : '';
-}
-function dt($field, $type)
-{
-    global $row;
+function val($field) { global $row; return htmlspecialchars($row[$field] ?? ''); }
+function chk($field, $value = 1) { global $row; return (isset($row[$field]) && $row[$field] == $value) ? 'checked' : ''; }
+function sel($field, $value) { global $row; return (isset($row[$field]) && $row[$field] == $value) ? 'selected' : ''; }
+function dt($field, $type) { 
+    global $row; 
     if (empty($row[$field])) return '';
     $dt = explode(' ', $row[$field]);
-    if ($type == 'd') return $dt[0]; // วันที่
-    if ($type == 't') return substr($dt[1], 0, 5); // เวลา
+    if ($type == 'd') return $dt[0]; 
+    if ($type == 't') return substr($dt[1], 0, 5); 
     return '';
 }
 ?>
@@ -56,11 +58,13 @@ function dt($field, $type)
     <title>3. OR Procedure - ระบบ Stroke Care</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -112,6 +116,16 @@ function dt($field, $type)
 
         <form id="orForm" onsubmit="return false;">
             <input type="hidden" name="admission_id" value="<?= $admission_id ?>">
+            
+            <input type="hidden" id="hospital_arrival_db" value="<?= $hospital_arrival_datetime ?>">
+            <input type="hidden" id="onset_datetime_db" value="<?= $onset_datetime ?>">
+
+            <div class="alert alert-info py-2 mb-3 small">
+                <div class="d-flex gap-4">
+                    <div><i class="bi bi-clock"></i> Onset: <strong><?= $onset_datetime ? date('d/m/Y H:i', strtotime($onset_datetime)) : '-' ?></strong></div>
+                    <div><i class="bi bi-hospital"></i> Arrival: <strong><?= $hospital_arrival_datetime ? date('d/m/Y H:i', strtotime($hospital_arrival_datetime)) : '-' ?></strong></div>
+                </div>
+            </div>
 
             <div class="card-form">
                 <div class="section-title" style="margin-top:0;">
@@ -144,21 +158,33 @@ function dt($field, $type)
                             <label class="form-label fw-bold">1. Anesthesia Time</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" id="anesthesia_time_mt" name="mt_anesthesia_date" value="<?= dt('mt_anesthesia_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="mt_anesthesia_time" value="<?= dt('mt_anesthesia_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" placeholder="เวลา" name="mt_anesthesia_time" value="<?= dt('mt_anesthesia_datetime', 't') ?>">
                             </div>
                         </div>
+                        
                         <div class="col-md-4 border-end">
                             <label class="form-label fw-bold">2. Puncture Time</label>
-                            <div class="input-group input-group-sm">
+                            <div class="input-group input-group-sm mb-2">
                                 <input type="date" class="form-control" id="puncture_time_mt" name="mt_puncture_date" value="<?= dt('mt_puncture_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="mt_puncture_time" value="<?= dt('mt_puncture_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" placeholder="เวลา" id="puncture_time_input" name="mt_puncture_time" value="<?= dt('mt_puncture_datetime', 't') ?>">
+                            </div>
+                            <div class="bg-primary bg-opacity-10 p-2 rounded">
+                                <label class="form-label small fw-bold text-primary mb-0">Door to Puncture (นาที)</label>
+                                <input type="text" class="form-control form-control-sm fw-bold text-primary border-0 bg-transparent" 
+                                       id="calc_door_to_puncture" name="time_door_to_puncture_min" readonly placeholder="..." value="<?= val('time_door_to_puncture_min') ?>">
                             </div>
                         </div>
+
                         <div class="col-md-4">
                             <label class="form-label fw-bold">3. Recanalization Time</label>
-                            <div class="input-group input-group-sm">
+                            <div class="input-group input-group-sm mb-2">
                                 <input type="date" class="form-control" id="recanalization_time" name="mt_recanalization_date" value="<?= dt('mt_recanalization_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="mt_recanalization_time" value="<?= dt('mt_recanalization_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" placeholder="เวลา" id="recanalization_time_input" name="mt_recanalization_time" value="<?= dt('mt_recanalization_datetime', 't') ?>">
+                            </div>
+                            <div class="bg-warning bg-opacity-10 p-2 rounded">
+                                <label class="form-label small fw-bold text-dark mb-0">Onset to Recanalization (นาที)</label>
+                                <input type="text" class="form-control form-control-sm fw-bold text-dark border-0 bg-transparent" 
+                                       id="calc_onset_to_recanalization" name="time_onset_to_recanalization_min" readonly placeholder="..." value="<?= val('time_onset_to_recanalization_min') ?>">
                             </div>
                         </div>
                     </div>
@@ -173,23 +199,23 @@ function dt($field, $type)
                             <label for="occlusionvessel" class="form-label fw-bold text-muted">Occlusion Vessel</label>
                             <select class="form-select" id="occlusionvessel" name="mt_occlusion_vessel">
                                 <option value="" disabled <?= sel('mt_occlusion_vessel', '') ?>>-- เลือกตำแหน่ง --</option>
-                                <option value="Left ICA" <?= sel('occlusion_site', 'Left ICA') ?>>Cervical ICA left</option>
-                            <option value="Right ICA" <?= sel('occlusion_site', 'Right ICA') ?>>Cervical ICA Right</option>
-                            <option value="Intracranial left ICA" <?= sel('occlusion_site', 'Intracranial left ICA') ?>>Intracranial ICA left</option>
-                            <option value="Intracranial Right ICA" <?= sel('occlusion_site', 'Intracranial Right ICA') ?>>Intracranial ICA Right</option>
-                            <option value="Left M1 of MCA" <?= sel('occlusion_site', 'Left M1 of MCA') ?>>Left M1 of MCA</option>
-                            <option value="Right M1 of MCA" <?= sel('occlusion_site', 'Right M1 of MCA') ?>>Right M1 of MCA</option>
-                            <option value="Left M2 of MCA" <?= sel('occlusion_site', 'Left M2 of MCA') ?>>Left M2 of MCA</option>
-                            <option value="Right M2 of MCA" <?= sel('occlusion_site', 'Right M2 of MCA') ?>>Right M2 of MCA</option>
-                            <option value="Left Beyond M2 of MCA" <?= sel('occlusion_site', 'Left Beyond M2 of MCA') ?>>Left Beyond M2 of MCA</option>
-                            <option value="Right Beyond M2 of MCA" <?= sel('occlusion_site', 'Right Beyond M2 of MCA') ?>>Right Beyond M2 of MCA</option>
-                            <option value="Left ACA" <?= sel('occlusion_site', 'Left ACA') ?>>Left ACA</option>
-                            <option value="Right ACA" <?= sel('occlusion_site', 'Right ACA') ?>>Right ACA</option>
-                            <option value="Left PCA" <?= sel('occlusion_site', 'Left PCA') ?>>Left PCA</option>
-                            <option value="Right PCA" <?= sel('occlusion_site', 'Right PCA') ?>>Right PCA</option>
-                            <option value="left Vertebral artery" <?= sel('occlusion_site', 'left Vertebral artery') ?>>left Vertebral artery</option>
-                            <option value="Right Vertebral artery" <?= sel('occlusion_site', 'Right Vertebral artery') ?>>Right Vertebral artery</option>
-                            <option value="Basilar" <?= sel('occlusion_site', 'Basilar') ?>>Basilar</option>
+                                <option value="Left ICA" <?= sel('mt_occlusion_vessel', 'Left ICA') ?>>Cervical ICA left</option>
+                                <option value="Right ICA" <?= sel('mt_occlusion_vessel', 'Right ICA') ?>>Cervical ICA Right</option>
+                                <option value="Intracranial left ICA" <?= sel('mt_occlusion_vessel', 'Intracranial left ICA') ?>>Intracranial ICA left</option>
+                                <option value="Intracranial Right ICA" <?= sel('mt_occlusion_vessel', 'Intracranial Right ICA') ?>>Intracranial ICA Right</option>
+                                <option value="Left M1 of MCA" <?= sel('mt_occlusion_vessel', 'Left M1 of MCA') ?>>Left M1 of MCA</option>
+                                <option value="Right M1 of MCA" <?= sel('mt_occlusion_vessel', 'Right M1 of MCA') ?>>Right M1 of MCA</option>
+                                <option value="Left M2 of MCA" <?= sel('mt_occlusion_vessel', 'Left M2 of MCA') ?>>Left M2 of MCA</option>
+                                <option value="Right M2 of MCA" <?= sel('mt_occlusion_vessel', 'Right M2 of MCA') ?>>Right M2 of MCA</option>
+                                <option value="Left Beyond M2 of MCA" <?= sel('mt_occlusion_vessel', 'Left Beyond M2 of MCA') ?>>Left Beyond M2 of MCA</option>
+                                <option value="Right Beyond M2 of MCA" <?= sel('mt_occlusion_vessel', 'Right Beyond M2 of MCA') ?>>Right Beyond M2 of MCA</option>
+                                <option value="Left ACA" <?= sel('mt_occlusion_vessel', 'Left ACA') ?>>Left ACA</option>
+                                <option value="Right ACA" <?= sel('mt_occlusion_vessel', 'Right ACA') ?>>Right ACA</option>
+                                <option value="Left PCA" <?= sel('mt_occlusion_vessel', 'Left PCA') ?>>Left PCA</option>
+                                <option value="Right PCA" <?= sel('mt_occlusion_vessel', 'Right PCA') ?>>Right PCA</option>
+                                <option value="left Vertebral artery" <?= sel('mt_occlusion_vessel', 'left Vertebral artery') ?>>left Vertebral artery</option>
+                                <option value="Right Vertebral artery" <?= sel('mt_occlusion_vessel', 'Right Vertebral artery') ?>>Right Vertebral artery</option>
+                                <option value="Basilar" <?= sel('mt_occlusion_vessel', 'Basilar') ?>>Basilar</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
@@ -371,6 +397,67 @@ function dt($field, $type)
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- TIME CALCULATION LOGIC ---
+            const arrivalVal = document.getElementById('hospital_arrival_db').value;
+            const onsetVal = document.getElementById('onset_datetime_db').value;
+
+            const inputsCalc = [
+                document.getElementById('puncture_time_mt'),
+                document.getElementById('puncture_time_input'),
+                document.getElementById('recanalization_time'),
+                document.getElementById('recanalization_time_input')
+            ];
+
+            const outDoorPuncture = document.getElementById('calc_door_to_puncture');
+            const outOnsetRecanalization = document.getElementById('calc_onset_to_recanalization');
+
+            function calculateMinutes(startStr, endStr) {
+                if(!startStr || !endStr) return '';
+                const start = new Date(startStr.replace(' ', 'T')); 
+                const end = new Date(endStr);
+                if (isNaN(start.getTime()) || isNaN(end.getTime())) return ''; 
+                const diffMs = end - start; 
+                return Math.floor(diffMs / 60000); 
+            }
+
+            function updateOrCalculations() {
+                // A. Door to Puncture (Arrival -> Puncture)
+                if (arrivalVal) {
+                    const arrDateTime = arrivalVal.replace(' ', 'T');
+                    const punDate = document.getElementById('puncture_time_mt').value;
+                    const punTime = document.getElementById('puncture_time_input').value;
+                    
+                    if(punDate && punTime) {
+                        const minPun = calculateMinutes(arrDateTime, `${punDate}T${punTime}`);
+                        outDoorPuncture.value = (minPun !== '' && !isNaN(minPun)) ? minPun : '';
+                    } else { outDoorPuncture.value = ''; }
+                }
+
+                // B. Onset to Recanalization (Onset -> Recanalization)
+                if (onsetVal) {
+                    const onsetDateTime = onsetVal.replace(' ', 'T');
+                    const recDate = document.getElementById('recanalization_time').value;
+                    const recTime = document.getElementById('recanalization_time_input').value;
+
+                    if(recDate && recTime) {
+                        const minRec = calculateMinutes(onsetDateTime, `${recDate}T${recTime}`);
+                        outOnsetRecanalization.value = (minRec !== '' && !isNaN(minRec)) ? minRec : '';
+                    } else { outOnsetRecanalization.value = ''; }
+                }
+            }
+
+            // Bind Events
+            inputsCalc.forEach(el => {
+                if(el) {
+                    el.addEventListener('change', updateOrCalculations);
+                    el.addEventListener('input', updateOrCalculations);
+                }
+            });
+
+            // Initial Call
+            updateOrCalculations();
+
+            // --- UI Logic (Show/Hide) ---
             const radioMT = document.getElementById('procTypeMT');
             const radioHemo = document.getElementById('procTypeHemo');
             const mtProcedure = document.getElementById('mtProcedure');
@@ -423,34 +510,17 @@ function dt($field, $type)
                         confirmButtonText: 'ใช่, บันทึกเลย'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // แสดง Loading
-                            Swal.fire({
-                                title: 'กำลังบันทึก...',
-                                didOpen: () => Swal.showLoading()
-                            });
+                            Swal.fire({ title: 'กำลังบันทึก...', didOpen: () => Swal.showLoading() });
 
                             const formData = new FormData(orForm);
 
-                            fetch('save_or.php', {
-                                    method: 'POST',
-                                    body: formData
-                                })
+                            fetch('save_or.php', { method: 'POST', body: formData })
                                 .then(response => response.json())
                                 .then(data => {
                                     if (data.status === 'success') {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'สำเร็จ!',
-                                            text: 'บันทึกข้อมูล OR เรียบร้อยแล้ว',
-                                            timer: 1500,
-                                            showConfirmButton: false
-                                        });
-
-                                        // เปลี่ยนปุ่ม
+                                        Swal.fire({ icon: 'success', title: 'สำเร็จ!', text: 'บันทึกข้อมูล OR เรียบร้อยแล้ว', timer: 1500, showConfirmButton: false });
                                         saveButton.classList.replace('btn-primary', 'btn-secondary');
                                         saveButton.innerHTML = '<i class="bi bi-check-lg"></i> บันทึกแล้ว';
-
-                                        // โชว์ปุ่มไปหน้า Ward
                                         nextButton.classList.remove('d-none');
                                         nextButton.href = data.redirect_url;
                                     } else {
@@ -467,6 +537,21 @@ function dt($field, $type)
             }
         });
     </script>
+     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".timepicker", {
+            enableTime: true,       // เปิดโหมดเวลา
+            noCalendar: true,       // ไม่เอาปฏิทิน (เอาแต่นาฬิกา)
+            dateFormat: "H:i",      // รูปแบบ 24 ชั่วโมง (เช่น 14:30)
+            time_24hr: true,        // บังคับ 24 ชั่วโมงแน่นอน
+            allowInput: true        // อนุญาตให้พิมพ์ตัวเลขเองได้ด้วย
+            ,onClose: function(selectedDates, dateStr, instance) {
+                // Trigger Event เพื่อให้สูตรคำนวณทำงาน (สำหรับเคสที่เลือกเวลาแล้วไม่คำนวณ)
+                instance.element.dispatchEvent(new Event('change'));
+                instance.element.dispatchEvent(new Event('input'));
+            }
+        });
+    });
+</script>
 </body>
-
 </html>

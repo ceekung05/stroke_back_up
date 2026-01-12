@@ -9,6 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $admission_id = $_POST['admission_id'] ?? '';
     $first_followup_date = $_POST['first_followup_date'] ?? null;
     $discharge_destination = $_POST['discharge_destination'] ?? null;
+    $refer_name_hospital = $_POST['refer_name_hospital'] ?? null;
 
     if (empty($admission_id)) {
         echo json_encode(['status' => 'error', 'message' => 'Missing ID']);
@@ -19,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sql = "UPDATE tbl_ward SET 
             first_followup_date = ?, 
             discharge_destination = ?,
+            refer_name_hospital = ?,
             updated_by = ?,      -- เพิ่ม
             updated_at = NOW()   -- เพิ่ม
             WHERE admission_id = ?";
@@ -26,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $conn->prepare($sql);
 
     // 3. แก้ bind_param (เพิ่ม s ตรงกลางสำหรับ updated_by)
-    $stmt->bind_param("sssi", $first_followup_date, $discharge_destination, $current_user, $admission_id);
+    $stmt->bind_param("ssssi", $first_followup_date, $discharge_destination,$refer_name_hospital, $current_user, $admission_id);
 
     if ($stmt->execute()) {
         echo json_encode(['status' => 'success', 'message' => 'บันทึกข้อมูลจำหน่ายสำเร็จ']);

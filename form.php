@@ -77,6 +77,8 @@ function dt($field, $type)
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -415,7 +417,7 @@ function dt($field, $type)
                             </div>
                             <div class="col-md-3">
                                 <label for="refer_departure_time" class="form-label">เวลาที่รถออก (Time)</label>
-                                <input type="time" class="form-control" id="refer_departure_time" name="refer_departure_time" value="<?= dt('transfer_departure_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" id="refer_departure_time" name="refer_departure_time" value="<?= dt('transfer_departure_datetime', 't') ?>" readonly>
                             </div>
                             <div class="col-md-3">
                                 <label for="refer_arrival_date" class="form-label ">วันที่ที่ผป.มาถึง</label>
@@ -423,7 +425,7 @@ function dt($field, $type)
                             </div>
                             <div class="col-md-3">
                                 <label for="refer_arrival_time" class="form-label">เวลา</label>
-                                <input type="time" class="form-control" name="refer_arrival_time" value="<?= dt('refer_arrival_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" name="refer_arrival_time" value="<?= dt('refer_arrival_datetime', 't') ?>">
                             </div>
                         </div>
                     </div>
@@ -436,7 +438,7 @@ function dt($field, $type)
                             </div>
                             <div class="col-md-3">
                                 <label for="first_medical_contact_time" class="form-label">Time</label>
-                                <input type="time" class="form-control" name="first_medical_contact_time" value="<?= dt('ems_first_medical_contact', 't') ?>">
+                                <input type="text" class="form-control timepicker" name="first_medical_contact_time" value="<?= dt('ems_first_medical_contact', 't') ?>">
                             </div>
                         </div>
                     </div>
@@ -449,7 +451,7 @@ function dt($field, $type)
                             </div>
                             <div class="col-md-3">
                                 <label for="er_arrival_time" class="form-label">Time</label>
-                                <input type="time" class="form-control" name="er_arrival_time" value="<?= dt('walk_in_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" value="<?= dt('walk_in_datetime', 't') ?>">
                             </div>
                         </div>
                     </div>
@@ -522,7 +524,7 @@ function dt($field, $type)
                             </div>
                             <div class="col-md-3">
                                 <label class="form-label">Time</label>
-                                <input type="time" class="form-control" name="ipd_onset_time" value="<?= dt('ipd_onset_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" name="ipd_onset_time" value="<?= dt('ipd_onset_datetime', 't') ?>">
                             </div>
                         </div>
                     </div>
@@ -603,7 +605,7 @@ function dt($field, $type)
                             <label class="form-label small text-muted mb-0">เวลาที่เริ่มมีอาการ (Onset)</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" name="onsetTime_onset_date" value="<?= dt('onset_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="onsetTime_onset_time" value="<?= dt('onset_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" name="onsetTime_onset_time" value="<?= dt('onset_datetime', 't') ?>">
                             </div>
                         </div>
                     </div>
@@ -689,7 +691,7 @@ function dt($field, $type)
                             <label class="form-label small text-muted mb-0">เวลาที่ถึง รพ.หาดใหญ่ (Arrival)</label>
                             <div class="input-group input-group-sm">
                                 <input type="date" class="form-control" name="arrivalTime_date" value="<?= dt('hospital_arrival_datetime', 'd') ?>">
-                                <input type="time" class="form-control" name="arrivalTime_time" value="<?= dt('hospital_arrival_datetime', 't') ?>">
+                                <input type="text" class="form-control timepicker" name="arrivalTime_time" value="<?= dt('hospital_arrival_datetime', 't') ?>">
                             </div>
                         </div>
                     </div>
@@ -1143,6 +1145,19 @@ function dt($field, $type)
             updateCalculations();
         });
     </script>
+    <!-- เวลา -->
+     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".timepicker", {
+            enableTime: true,       // เปิดโหมดเวลา
+            noCalendar: true,       // ไม่เอาปฏิทิน (เอาแต่นาฬิกา)
+            dateFormat: "H:i",      // รูปแบบ 24 ชั่วโมง (เช่น 14:30)
+            time_24hr: true,        // บังคับ 24 ชั่วโมงแน่นอน
+            allowInput: true        // อนุญาตให้พิมพ์ตัวเลขเองได้ด้วย
+        });
+    });
+</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.min.js"></script>
 </body>
 
 </html>

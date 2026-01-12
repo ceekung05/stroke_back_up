@@ -43,6 +43,8 @@ function sel($field, $value)
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -110,10 +112,10 @@ function sel($field, $value)
                     </div>
                     <div class="col-md-4">
                         <div id="referHospitalDiv" class="mt-2" style="display: none;">
-                            <input type="text" class="form-control" name="refer_hospital_name"
+                            <input type="text" class="form-control" name="refer_name_hospital"
                                 id="referHospitalName"
                                 placeholder="ระบุชื่อโรงพยาบาลปลายทาง..."
-                                value="<?= val('refer_hospital_name') ?>">
+                                value="<?= val('refer_name_hospital') ?>">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -459,6 +461,19 @@ function sel($field, $value)
             });
         });
     </script>
+     <!-- เวลา -->
+     <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        flatpickr(".timepicker", {
+            enableTime: true,       // เปิดโหมดเวลา
+            noCalendar: true,       // ไม่เอาปฏิทิน (เอาแต่นาฬิกา)
+            dateFormat: "H:i",      // รูปแบบ 24 ชั่วโมง (เช่น 14:30)
+            time_24hr: true,        // บังคับ 24 ชั่วโมงแน่นอน
+            allowInput: true        // อนุญาตให้พิมพ์ตัวเลขเองได้ด้วย
+        });
+    });
+</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clockpicker/0.0.7/bootstrap-clockpicker.min.js"></script>
 </body>
 
 </html>

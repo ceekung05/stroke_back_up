@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connectdb.php'; // เชื่อมต่อฐานข้อมูล
+require_once 'connectdb.php'; 
 
 if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
     header("Location: login.php");
@@ -8,11 +8,10 @@ if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
 }
 $user = $_SESSION['user_data'];
 
-// --- ส่วนดึงข้อมูลเก่า (Edit Mode) ---
 $admission_id = $_GET['admission_id'] ?? '';
 $row = []; 
 
-// 1. ดึงข้อมูลสรุป (Summary) จาก tbl_ward
+// 1. ดึงข้อมูลสรุป
 if ($admission_id) {
     $sql = "SELECT * FROM tbl_ward WHERE admission_id = ?";
     $stmt = $conn->prepare($sql);
@@ -22,7 +21,7 @@ if ($admission_id) {
     $row = $result->fetch_assoc();
 }
 
-// 2. ดึงข้อมูล Monitoring (เพื่อเอาไปวนลูปแสดงในตาราง)
+// 2. ดึงข้อมูล Monitoring
 $monitor_rows = [];
 if ($admission_id) {
     $sql_mon = "SELECT * FROM tbl_ward_monitoring WHERE admission_id = ? ORDER BY record_datetime ASC";
@@ -35,7 +34,6 @@ if ($admission_id) {
     }
 }
 
-// --- ฟังก์ชันช่วยแสดงผล ---
 function val($field) { global $row; return htmlspecialchars($row[$field] ?? ''); }
 function chk($field, $value = 1) { global $row; return (isset($row[$field]) && $row[$field] == $value) ? 'checked' : ''; }
 function sel($field, $value) { global $row; return (isset($row[$field]) && $row[$field] == $value) ? 'selected' : ''; }
@@ -43,8 +41,8 @@ function dt($field, $type) {
     global $row; 
     if (empty($row[$field])) return '';
     $dt = explode(' ', $row[$field]);
-    if ($type == 'd') return $dt[0]; // วันที่
-    if ($type == 't') return substr($dt[1], 0, 5); // เวลา
+    if ($type == 'd') return $dt[0]; 
+    if ($type == 't') return substr($dt[1], 0, 5); 
     return '';
 }
 ?>
@@ -59,8 +57,11 @@ function dt($field, $type) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/material_blue.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 </head>
 
 <body>
@@ -170,7 +171,7 @@ function dt($field, $type) {
                         <label for="ctFirstDay" class="form-label fw-bold">ส่งตรวจ CT brain (Follow up)</label>
                         <div class="input-group">
                             <input type="date" class="form-control" id="ctFirstDay" name="ct_date" value="<?= dt('followup_ct_datetime', 'd') ?>">
-                            <input type="time" class="form-control" name="ct_time" value="<?= dt('followup_ct_datetime', 't') ?>">
+                            <input type="text" class="form-control timepicker" placeholder="เวลา" name="ct_time" value="<?= dt('followup_ct_datetime', 't') ?>">
                         </div>
                     </div>
                     <div class="col-md-7">
@@ -189,7 +190,7 @@ function dt($field, $type) {
                         <label for="discharge_check_date" class="form-label fw-bold">วันที่ประเมิน</label>
                         <div class="input-group">
                             <input type="date" class="form-control" id="discharge_check_date" name="dc_assess_date" value="<?= dt('discharge_assess_datetime', 'd') ?>">
-                            <input type="time" class="form-control" name="dc_assess_time" value="<?= dt('discharge_assess_datetime', 't') ?>">
+                            <input type="text" class="form-control timepicker" placeholder="เวลา" name="dc_assess_time" value="<?= dt('discharge_assess_datetime', 't') ?>">
                         </div>
                     </div>
                 </div>
@@ -209,12 +210,6 @@ function dt($field, $type) {
                             <input type="number" class="form-control" id="barthel" name="barthel" value="<?= val('discharge_barthel') ?>" placeholder="Score">
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="p-3 bg-light border rounded h-100">
-                            <label for="hrs" class="form-label fw-bold">HRS</label>
-                            <input type="number" class="form-control" id="hrs" name="hrs" value="<?= val('discharge_hrs') ?>" placeholder="Score">
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -222,9 +217,50 @@ function dt($field, $type) {
                 <div class="section-title" style="margin-top:0;">
                     <i class="bi bi-door-open"></i> 4. สรุปสถานะจำหน่าย (Discharge Summary)
                 </div>
+                
                 <div class="row g-4">
-                    <div class="col-md-5 border-end">
-                        <h6 class="fw-bold text-secondary mb-3">การวางแผนจำหน่าย (Plan)</h6>
+                    <div class="col-md-4 border-end">
+                        <h6 class="fw-bold text-primary mb-3">4.1 ประเภทการจำหน่าย (Discharge Type)</h6>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_type" id="type_approval" value="approval" <?= chk('discharge_type', 'approval') ?>>
+                                <label class="form-check-label fw-bold text-success" for="type_approval">With Approval (แพทย์อนุญาต)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_type" id="type_refer" value="refer" <?= chk('discharge_type', 'refer') ?>>
+                                <label class="form-check-label" for="type_refer">Refer back (ส่งต่อ)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_type" id="type_against" value="against" <?= chk('discharge_type', 'against') ?>>
+                                <label class="form-check-label text-warning" for="type_against">Against Advice (ไม่สมัครใจอยู่)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_type" id="type_death" value="death" <?= chk('discharge_type', 'death') ?>>
+                                <label class="form-check-label text-danger fw-bold" for="type_death">Death (เสียชีวิต)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 border-end">
+                        <h6 class="fw-bold text-secondary mb-3">4.2 สถานะอาการ (Medical Status)</h6>
+                        <div class="d-flex flex-column gap-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_status" id="status_recovery" value="recovery" <?= chk('discharge_status', 'recovery') ?>>
+                                <label class="form-check-label" for="status_recovery">Complete Recovery (หายดี)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_status" id="status_improve" value="improve" <?= chk('discharge_status', 'improve') ?>>
+                                <label class="form-check-label" for="status_improve">Improved (ดีขึ้น)</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="discharge_status" id="status_not_improve" value="not_improved" <?= chk('discharge_status', 'not_improved') ?>>
+                                <label class="form-check-label text-danger" for="status_not_improve">Not Improved (ไม่ดีขึ้น)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <h6 class="fw-bold text-secondary mb-3">4.3 การวางแผนจำหน่าย (Plan)</h6>
                         <div class="d-flex gap-3 mb-3">
                             <div class="form-check">
                                 <input class="form-check-input" type="radio" name="discharge_planning" id="plan_came" value="came" <?= chk('discharge_plan_status', 'came') ?>>
@@ -239,40 +275,6 @@ function dt($field, $type) {
                         <div class="p-3 bg-light rounded border" id="discharge_date_field" style="<?= (isset($row['discharge_plan_status']) && $row['discharge_plan_status'] == 'came') ? '' : 'display: none;' ?>">
                             <label for="discharge_date_input" class="form-label fw-bold">วันที่จำหน่ายจริง:</label>
                             <input type="date" class="form-control" id="discharge_date_input" name="discharge_date" value="<?= val('discharge_date') ?>">
-                        </div>
-                    </div>
-
-                    <div class="col-md-7">
-                        <h6 class="fw-bold text-secondary mb-3">สถานะจำหน่าย (Status)</h6>
-                        <div class="row g-2">
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="discharge_status" id="status_recovery" value="recovery" <?= chk('discharge_status', 'recovery') ?>>
-                                    <label class="form-check-label" for="status_recovery">Complete Recovery</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="discharge_status" id="status_improve" value="improve" <?= chk('discharge_status', 'improve') ?>>
-                                    <label class="form-check-label" for="status_improve">Improved</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="discharge_status" id="status_disability" value="disability" <?= chk('discharge_status', 'disability') ?>>
-                                    <label class="form-check-label" for="status_disability">Disability (พิการ)</label>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="discharge_status" id="status_refer" value="refer" <?= chk('discharge_status', 'refer') ?>>
-                                    <label class="form-check-label" for="status_refer">Refer back</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="discharge_status" id="status_against" value="against" <?= chk('discharge_status', 'against') ?>>
-                                    <label class="form-check-label text-warning" for="status_against">Against Advice</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="discharge_status" id="status_death" value="death" <?= chk('discharge_status', 'death') ?>>
-                                    <label class="form-check-label text-danger fw-bold" for="status_death">Death</label>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -333,11 +335,12 @@ function dt($field, $type) {
             </div>
         </div>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             
-            // 1. Logic ซ่อน/แสดง วันที่จำหน่าย
+            // 1. Logic Show/Hide Date
             const dischargeRadios = document.querySelectorAll('input[name="discharge_planning"]');
             const dischargeDateField = document.getElementById('discharge_date_field');
             const dischargeDateInput = document.getElementById('discharge_date_input');
@@ -354,13 +357,11 @@ function dt($field, $type) {
             dischargeRadios.forEach(radio => {
                 radio.addEventListener('change', updateDischargeField);
             });
-            // updateDischargeField(); // ไม่ต้องเรียก เพราะ PHP จัดการ style ให้แล้ว
 
-            // 2. Logic บันทึก Modal (Monitoring)
+            // 2. Logic บันทึก Monitoring (Modal)
             const saveEntryBtn = document.getElementById('saveWardEntryBtn');
             const entryForm = document.getElementById('wardEntryForm');
             const addEntryModal = new bootstrap.Modal(document.getElementById('addEntryModal'));
-            const tableBody = document.getElementById('monitoringTableBody');
 
             if(saveEntryBtn) {
                 saveEntryBtn.addEventListener('click', function() {
@@ -374,7 +375,6 @@ function dt($field, $type) {
                             Swal.fire({ title: 'บันทึกสำเร็จ', icon: 'success', timer: 1000, showConfirmButton: false });
                             addEntryModal.hide();
                             entryForm.reset();
-                            // Reload หน้าเว็บเพื่อแสดงข้อมูลใหม่ในตาราง
                             location.reload(); 
                         } else {
                             Swal.fire('Error', data.message, 'error');
@@ -387,9 +387,8 @@ function dt($field, $type) {
             const saveSummaryBtn = document.getElementById('saveWardSummaryBtn');
             const nextButton = document.getElementById('nextStepBtn');
             const summaryForm = document.getElementById('wardSummaryForm');
-
-            // โชว์ปุ่ม Next ถ้ามี ID อยู่แล้ว
             const admissionId = document.querySelector('input[name="admission_id"]').value;
+            
             if(admissionId) {
                 nextButton.classList.remove('d-none');
             }
@@ -415,6 +414,15 @@ function dt($field, $type) {
                     });
                 });
             }
+
+            // 4. Timepicker
+            flatpickr(".timepicker", {
+                enableTime: true,
+                noCalendar: true,
+                dateFormat: "H:i",
+                time_24hr: true,
+                allowInput: true
+            });
         });
     </script>
 </body>
