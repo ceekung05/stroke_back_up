@@ -10,20 +10,22 @@ $user = $_SESSION['user_data'];
 
 // --- ส่วนจัดการตัวกรอง (Filter & Search) ---
 $search_text = $_GET['search'] ?? '';
-$filter_year = $_GET['year'] ?? ''; // ถ้าไม่เลือก จะแสดงทั้งหมด หรือคุณอาจจะตั้ง default เป็น date('Y') ก็ได้
+$filter_year = $_GET['year'] ?? ''; 
 
 // สร้างเงื่อนไข SQL (WHERE clause)
-$conditions = ["1=1"]; // 1=1 คือเทคนิคเพื่อให้ต่อ AND ได้ง่าย
+$conditions = ["1=1"];
 $params = [];
 $types = "";
 
-// 1. กรองตามคำค้นหา (HN หรือ ชื่อ-สกุล)
+// 1. กรองตามคำค้นหา (HN, AN หรือ ชื่อ-สกุล)
 if (!empty($search_text)) {
-    $conditions[] = "(adm.patient_hn LIKE ? OR pat.flname LIKE ?)";
+    // เพิ่มการค้นหาด้วย AN (adm.patient_an)
+    $conditions[] = "(adm.patient_hn LIKE ? OR adm.patient_an LIKE ? OR pat.flname LIKE ?)";
     $search_param = "%{$search_text}%";
     $params[] = $search_param;
     $params[] = $search_param;
-    $types .= "ss";
+    $params[] = $search_param;
+    $types .= "sss";
 }
 
 // 2. กรองตามปี (ใช้ created_at ของ Admission)
@@ -36,12 +38,13 @@ if (!empty($filter_year)) {
 // รวมเงื่อนไข
 $where_sql = "WHERE " . implode(" AND ", $conditions);
 
-// ดึงข้อมูล
+// --- [แก้ไขจุดที่ 1] เพิ่มการดึงค่า patient_an และ date_admit ---
 $sql = "SELECT 
             adm.id AS admission_id,
             adm.patient_hn,
-            adm.onset_datetime,
-            adm.created_at, -- ดึงมาเพื่อใช้ตรวจสอบ
+            adm.patient_an,   /* <-- เพิ่ม AN */
+            adm.date_admit,   /* <-- เพิ่ม Date Admit */
+            adm.created_at, 
             pat.flname,
             er.ct_result,
             ward.discharge_status
@@ -59,7 +62,7 @@ if (!empty($params)) {
 $stmt->execute();
 $result = $stmt->get_result();
 
-// --- ดึงรายการปีที่มีในระบบมาทำ Dropdown ---
+// ดึงรายการปีมาทำ Dropdown
 $year_sql = "SELECT DISTINCT YEAR(created_at) as year_val FROM tbl_stroke_admission ORDER BY year_val DESC";
 $year_query = $conn->query($year_sql);
 ?>
@@ -134,7 +137,7 @@ $year_query = $conn->query($year_sql);
                     <div class="col-md-6">
                         <div class="input-group">
                             <span class="input-group-text bg-white border-end-0 border-primary"><i class="bi bi-search text-primary"></i></span>
-                            <input type="text" name="search" class="form-control border-start-0 border-primary" placeholder="ค้นหา HN หรือ ชื่อ-นามสกุล..." value="<?= htmlspecialchars($search_text) ?>">
+                            <input type="text" name="search" class="form-control border-start-0 border-primary" placeholder="ค้นหา HN, AN หรือ ชื่อ-นามสกุล..." value="<?= htmlspecialchars($search_text) ?>">
                             <button class="btn btn-primary" type="submit">ค้นหา</button>
                         </div>
                     </div>
@@ -155,11 +158,13 @@ $year_query = $conn->query($year_sql);
                 <table class="table table-hover align-middle mb-0">
                     <thead class="bg-light text-secondary">
                         <tr>
-                            <th class="ps-4 py-3">HN</th>
+                            <!-- [แก้ไขจุดที่ 2] เปลี่ยนชื่อหัวตาราง -->
+                            <th class="ps-4 py-3">HN / AN</th>
                             <th class="py-3">ชื่อ-นามสกุล</th>
                             <th class="py-3">ประเภท (Diagnosis)</th>
-                            <th class="py-3">Onset Date</th>
-                            <th class="py-3">วันที่ลงทะเบียน</th> <th class="py-3">สถานะ (Status)</th>
+                            <th class="py-3">Date Admit</th> <!-- เปลี่ยนจาก Onset Date -->
+                            <th class="py-3">วันที่ลงทะเบียน</th> 
+                            <th class="py-3">สถานะ (Status)</th>
                             <th class="text-center py-3">จัดการ</th>
                             <th class="text-center py-3">ติดตามอาการ</th>
                         </tr>
@@ -167,7 +172,7 @@ $year_query = $conn->query($year_sql);
                     <tbody>
                         <?php if ($result->num_rows > 0): ?>
                             <?php while($row = $result->fetch_assoc()): 
-                                // จัดการ Status Badge
+                                // สถานะ
                                 $status_badge = '';
                                 if(!empty($row['discharge_status'])) {
                                     $status_badge = '<span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3"><i class="bi bi-check-circle-fill me-1"></i> Discharged</span>';
@@ -175,13 +180,13 @@ $year_query = $conn->query($year_sql);
                                     $status_badge = '<span class="badge bg-warning bg-opacity-10 text-warning-emphasis rounded-pill px-3"><i class="bi bi-hospital me-1"></i> Admitted</span>';
                                 }
 
-                                // จัดการ Onset Date
-                                $onset = !empty($row['onset_datetime']) ? date('d/m/Y H:i', strtotime($row['onset_datetime'])) : '<span class="text-muted">-</span>';
+                                // [แก้ไขจุดที่ 3] เปลี่ยนการแสดงผลวันที่เป็น Date Admit
+                                $date_admit_show = !empty($row['date_admit']) ? date('d/m/Y', strtotime($row['date_admit'])) : '<span class="text-muted">-</span>';
                                 
-                                // จัดการ Created Date (วันที่ลงทะเบียน)
+                                // วันที่ลงทะเบียน
                                 $regis_date = !empty($row['created_at']) ? date('d/m/Y', strtotime($row['created_at'])) : '-';
 
-                                // จัดการ CT Result Badge
+                                // CT Result Badge
                                 $ct_badge = '<span class="badge bg-secondary bg-opacity-10 text-secondary rounded-pill px-3">Pending</span>';
                                 if(isset($row['ct_result'])) {
                                     if($row['ct_result'] == 'ischemic') {
@@ -192,22 +197,31 @@ $year_query = $conn->query($year_sql);
                                 }
                             ?>
                             <tr style="cursor: pointer;" onclick="window.location='form.php?admission_id=<?= $row['admission_id'] ?>'">
-                                <td class="ps-4 fw-bold text-primary">
-                                    #<?= htmlspecialchars($row['patient_hn']) ?>
+                                <!-- [แก้ไขจุดที่ 4] แสดง HN และ AN คู่กัน -->
+                                <td class="ps-4">
+                                    <div class="fw-bold text-primary">HN: <?= htmlspecialchars($row['patient_hn']) ?></div>
+                                    <div class="small text-muted" style="font-size: 0.85rem;">
+                                        <i class="bi bi-hash"></i> AN: <?= !empty($row['patient_an']) ? htmlspecialchars($row['patient_an']) : '-' ?>
+                                    </div>
                                 </td>
+
                                 <td>
                                     <div class="fw-bold"><?= htmlspecialchars($row['flname']) ?></div>
                                 </td>
                                 <td><?= $ct_badge ?></td>
-                                <td class="text-muted small"><?= $onset ?></td>
-                                <td class="text-muted small"><?= $regis_date ?></td> <td><?= $status_badge ?></td>
+                                
+                                <!-- แสดง Date Admit -->
+                                <td class="text-primary fw-bold small"><?= $date_admit_show ?></td>
+                                
+                                <td class="text-muted small"><?= $regis_date ?></td> 
+                                <td><?= $status_badge ?></td>
                                 <td class="text-center">
                                     <a href="form.php?admission_id=<?= $row['admission_id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         <i class="bi bi-pencil-square me-1"></i> ดูข้อมูล
                                     </a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="form.php?admission_id=<?= $row['admission_id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <a href="follow.php?admission_id=<?= $row['admission_id'] ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                         <i class="bi bi-pencil-square me-1"></i> ติดตามอาการ
                                     </a>
                                 </td>
@@ -215,7 +229,7 @@ $year_query = $conn->query($year_sql);
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted"> <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                                <td colspan="8" class="text-center py-5 text-muted"> <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
                                     <?php if(!empty($search_text) || !empty($filter_year)): ?>
                                         ไม่พบข้อมูลที่ค้นหา
                                     <?php else: ?>

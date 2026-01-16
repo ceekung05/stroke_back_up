@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $ct_result = $_POST['ctResult'] ?? null;
 
         // 3. รับค่าการรักษา
-        $fibrinolytic_type = $_POST['fibrinolytic_type'] ?? null;
+        
         $tpa_datetime = combineDateTime($_POST['tpaDate'] ?? '', $_POST['tpaTime'] ?? '');
         $anesthesia_set_datetime = combineDateTime($_POST['anesthesiaTime_date'] ?? '', $_POST['anesthesiaTime_time'] ?? '');
         $activate_team_datetime = combineDateTime($_POST['punctureTime_date'] ?? '', $_POST['punctureTime_time'] ?? '');
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     consult_neuro_datetime, ctnc_datetime, cta_datetime, mri_datetime,
                     consult_intervention_datetime,
                     aspect_score, collateral_score, occlusion_site, ct_result,
-                    fibrinolytic_type, tpa_datetime,
+                    tpa_datetime,
                     anesthesia_set_datetime, activate_team_datetime,
                     consult_neurosurgeon_datetime,
                     time_door_to_doctor_min, time_door_to_ct_min, time_door_to_cta_min,
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ?, ?, ?, ?, 
                     ?, 
                     ?, ?, ?, ?, 
-                    ?, ?, 
+                    ?, 
                     ?, ?, 
                     ?, 
                     ?, ?, ?, 
@@ -93,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     occlusion_site = VALUES(occlusion_site),
                     ct_result = VALUES(ct_result),
                     
-                    fibrinolytic_type = VALUES(fibrinolytic_type),
+                    
                     tpa_datetime = VALUES(tpa_datetime),
                     
                     anesthesia_set_datetime = VALUES(anesthesia_set_datetime),
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // เพิ่ม i ท้ายสุดอีก 1 ตัว
         
         $stmt->bind_param(
-            "isssssiisssssssssiiiii", 
+            "isssssiissssssssiiiii", 
             $admission_id,
             
             $consult_neuro_datetime,
@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $occlusion_site,
             $ct_result,
             
-            $fibrinolytic_type,
+            
             $tpa_datetime,
             $anesthesia_set_datetime,
             $activate_team_datetime,

@@ -113,243 +113,330 @@ function dt($field, $type) {
             <input type="hidden" id="hospital_arrival_db" value="<?= $hospital_arrival_datetime ?>">
             
             <div class="card-form">
-                <div class="section-title" style="margin-top:0;">
-                    <i class="bi bi-clock-history"></i> 2. ลำดับเวลาการตรวจรักษา (Clinical Timeline)
-                </div>
-                
-                <div class="alert alert-info py-2 mb-3">
-                    <i class="bi bi-info-circle-fill"></i> เวลาที่ผู้ป่วยมาถึงโรงพยาบาล (Hospital Arrival): 
-                    <strong><?= $hospital_arrival_datetime ? date('d/m/Y H:i', strtotime($hospital_arrival_datetime)) : 'ยังไม่ระบุ (กรุณาระบุในหน้า 1)' ?></strong>
-                </div>
+    <div class="section-title" style="margin-top:0;">
+        <i class="bi bi-clock-history"></i> 2. ลำดับเวลาการตรวจรักษา (Clinical Timeline)
+    </div>
+    
+    <div class="arrival-alert-card mb-4">
+        <div class="icon-box"><i class="bi bi-hospital-fill"></i></div>
+        <div>
+            <div class="small fw-bold text-uppercase opacity-75">Hospital Arrival Time</div>
+            <div class="fs-5 fw-bold">
+                <?= $hospital_arrival_datetime ? date('d/m/Y H:i', strtotime($hospital_arrival_datetime)) : '<span class="text-muted fst-italic">ยังไม่ระบุ (กรุณาระบุในหน้า 1)</span>' ?>
+            </div>
+        </div>
+    </div>
 
-                <h6 class="fw-bold text-secondary mb-2">2.1 เวลาที่แพทย์ตรวจ</h6>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-3">
-                        <label for="consult_neuro_date" class="form-label">วันที่ส่งปรึกษา</label>
-                        <input type="date" id="consult_neuro_date" name="consult_neuro_date" class="form-control" value="<?= dt('consult_neuro_datetime', 'd') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="consult_neuro_time_input" class="form-label">เวลา</label>
-                        <input  type="text" class="form-control timepicker"  placeholder="คลิกเพื่อเลือกเวลา" id="consult_neuro_time_input" name="consult_neuro_time_input"  value="<?= dt('consult_neuro_datetime', 't') ?>">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Door to Consult Neurologist (นาที)</label>
-                        <div class="input-group">
-                             <span class="input-group-text bg-primary bg-opacity-10 text-primary"><i class="bi bi-calculator"></i></span>
-                             <input type="text" class="form-control fw-bold text-primary bg-primary bg-opacity-10" id="calc_door_to_doctor" name="time_door_to_doctor_min" readonly placeholder="..." value="<?= val('time_door_to_doctor_min') ?>">
-                        </div>
-                    </div>
-                </div>
-                
-                <hr class="text-muted opacity-25">
-
-                <h6 class="fw-bold text-secondary mb-2">2.2 เวลาทำ Imaging (CT / CTA / MRI)</h6>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4 border-end">
-                        <label class="form-label fw-bold text-primary">CT non-contrast</label>
-                        <div class="input-group input-group-sm mb-2">
-                            <input type="date" class="form-control" id="ctncDate" name="ctncDate" value="<?= dt('ctnc_datetime', 'd') ?>">
-                            <input type="text" class="form-control timepicker" placeholder="เวลา" id="ctncTime_input" name="ctncTime_input" value="<?= dt('ctnc_datetime', 't') ?>">
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-2 rounded">
-                            <label class="form-label small fw-bold text-primary mb-1">Door to CT (นาที)</label>
-                            <input type="text" class="form-control form-control-sm fw-bold text-primary" id="calc_door_to_ct" name="time_door_to_ct_min" readonly placeholder="..." value="<?= val('time_door_to_ct_min') ?>">
-                        </div>
-                    </div>
-
-                    <div class="col-md-4 border-end">
-                        <label class="form-label fw-bold text-primary">CTA</label>
-                        <div class="input-group input-group-sm mb-2">
-                            <input type="date" class="form-control" id="ctaTime" name="ctaTime" value="<?= dt('cta_datetime', 'd') ?>">
-                            <input type="text" class="form-control timepicker" placeholder="เวลา" id="ctaTime_input" name="ctaTime_input" value="<?= dt('cta_datetime', 't') ?>">
-                        </div>
-                        <div class="bg-primary bg-opacity-10 p-2 rounded">
-                            <label class="form-label small fw-bold text-primary mb-1">Door to CTA (นาที)</label>
-                            <input type="text" class="form-control form-control-sm fw-bold text-primary" id="calc_door_to_cta" name="time_door_to_cta_min" readonly placeholder="..." value="<?= val('time_door_to_cta_min') ?>">
-                        </div>
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">MRI</label>
-                        <div class="input-group input-group-sm mb-2">
-                            <input type="date" class="form-control" id="mriTime" name="mriTime" value="<?= dt('mri_datetime', 'd') ?>">
-                            <input type="text" class="form-control timepicker" placeholder="เวลา" id="mriTime_input" name="mriTime_input" value="<?= dt('mri_datetime', 't') ?>">
-                        </div>
-                    </div>
-                </div>
-
-                <hr class="text-muted opacity-25">
-
-                <h6 class="fw-bold text-secondary mb-2">2.3 Neuro-Interventionist</h6>
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <label for="consult_intervention_time" class="form-label">วันที่ปรึกษา</label>
-                        <input type="date" id="consult_intervention_time" name="consult_intervention_time" class="form-control" value="<?= dt('consult_intervention_datetime', 'd') ?>">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="consult_intervention_time_input" class="form-label">เวลา</label>
-                        <input type="text" class="form-control timepicker" placeholder="คลิกเพื่อเลือกใส่เวลา" id="consult_intervention_time_input" name="consult_intervention_time_input" value="<?= dt('consult_intervention_datetime', 't') ?>">
-                    </div>
+    <h6 class="fw-bold text-secondary mb-3 ps-2 border-start border-4 border-primary">2.1 แพทย์ระบบประสาท (Neurologist)</h6>
+    <div class="input-box-card mb-4">
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <label class="form-label text-muted small fw-bold">เวลาที่แพทย์ตรวจ (Consult Time)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-4"><i class="bi bi-calendar-event text-primary"></i></span>
+                    <input type="date" id="consult_neuro_date" name="consult_neuro_date" class="form-control border-start-0" value="<?= dt('consult_neuro_datetime', 'd') ?>">
                     
-                    <div class="col-md-4">
-                        <label class="form-label fw-bold text-primary">Door to Consult Interventionist (นาที)</label>
-                        <div class="input-group">
-                             <span class="input-group-text bg-primary bg-opacity-10 text-primary"><i class="bi bi-calculator"></i></span>
-                             <input type="text" class="form-control fw-bold text-primary bg-primary bg-opacity-10" id="calc_door_to_intervention" name="time_door_to_intervention_min" readonly placeholder="..." value="<?= val('time_door_to_intervention_min') ?>">
-                        </div>
-                    </div>
+                    <span class="input-group-text bg-white border-start-0 border-end-0"><i class="bi bi-clock text-primary"></i></span>
+                    <input type="text" class="form-control timepicker border-start-0 rounded-end-4" placeholder="เวลา" id="consult_neuro_time_input" name="consult_neuro_time_input" value="<?= dt('consult_neuro_datetime', 't') ?>">
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="calc-result-box">
+                    <label>Door to Consult (นาที)</label>
+                    <input type="text" id="calc_door_to_doctor" name="time_door_to_doctor_min" readonly placeholder="..." value="<?= val('time_door_to_doctor_min') ?>">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h6 class="fw-bold text-secondary mb-3 ps-2 border-start border-4 border-success">2.2 การทำ Imaging (CT / CTA / MRI)</h6>
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="input-box-card h-100">
+                <label class="form-label fw-bold text-success mb-2">CT Non-contrast</label>
+                <div class="input-group input-group-sm mb-3">
+                    <input type="date" class="form-control" id="ctncDate" name="ctncDate" value="<?= dt('ctnc_datetime', 'd') ?>">
+                    <input type="text" class="form-control timepicker text-center" placeholder="เวลา" id="ctncTime_input" name="ctncTime_input" value="<?= dt('ctnc_datetime', 't') ?>">
+                </div>
+                <div class="calc-result-box py-2" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    <label class="text-success">Door to CT (นาที)</label>
+                    <input type="text" class="text-success" id="calc_door_to_ct" name="time_door_to_ct_min" readonly placeholder="..." value="<?= val('time_door_to_ct_min') ?>">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="input-box-card h-100">
+                <label class="form-label fw-bold text-success mb-2">CTA</label>
+                <div class="input-group input-group-sm mb-3">
+                    <input type="date" class="form-control" id="ctaTime" name="ctaTime" value="<?= dt('cta_datetime', 'd') ?>">
+                    <input type="text" class="form-control timepicker text-center" placeholder="เวลา" id="ctaTime_input" name="ctaTime_input" value="<?= dt('cta_datetime', 't') ?>">
+                </div>
+                <div class="calc-result-box py-2" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    <label class="text-success">Door to CTA (นาที)</label>
+                    <input type="text" class="text-success" id="calc_door_to_cta" name="time_door_to_cta_min" readonly placeholder="..." value="<?= val('time_door_to_cta_min') ?>">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="input-box-card h-100">
+                <label class="form-label fw-bold text-secondary mb-2">MRI</label>
+                <div class="input-group input-group-sm mb-3">
+                    <input type="date" class="form-control" id="mriTime" name="mriTime" value="<?= dt('mri_datetime', 'd') ?>">
+                    <input type="text" class="form-control timepicker text-center" placeholder="เวลา" id="mriTime_input" name="mriTime_input" value="<?= dt('mri_datetime', 't') ?>">
+                </div>
+                <div class="text-center text-muted small mt-3 fst-italic">
+                    * ไม่มีการคำนวณเวลาสำหรับ MRI
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h6 class="fw-bold text-secondary mb-3 ps-2 border-start border-4 border-danger">2.3 Neuro-Interventionist</h6>
+    <div class="input-box-card">
+        <div class="row align-items-center g-3">
+            <div class="col-md-8">
+                <label class="form-label text-muted small fw-bold">เวลาส่งปรึกษา (Consult Time)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-4"><i class="bi bi-telephone-outbound text-danger"></i></span>
+                    <input type="date" id="consult_intervention_time" name="consult_intervention_time" class="form-control border-start-0" value="<?= dt('consult_intervention_datetime', 'd') ?>">
+                    
+                    <span class="input-group-text bg-white border-start-0 border-end-0"><i class="bi bi-clock text-danger"></i></span>
+                    <input type="text" class="form-control timepicker border-start-0 rounded-end-4" placeholder="เวลา" id="consult_intervention_time_input" name="consult_intervention_time_input" value="<?= dt('consult_intervention_datetime', 't') ?>">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="calc-result-box" style="background: #fff1f2; border-color: #fecdd3;">
+                    <label class="text-danger">Door to Interven. (นาที)</label>
+                    <input type="text" class="text-danger" id="calc_door_to_intervention" name="time_door_to_intervention_min" readonly placeholder="..." value="<?= val('time_door_to_intervention_min') ?>">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <div class="card-form">
-                <div class="section-title" style="margin-top:0;">
-                    <i class="bi bi-file-earmark-medical"></i> 3. ผลการตรวจ CT/CTA (Imaging Results)
-                </div>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-4">
-                        <label for="aspect" class="form-label fw-bold">ASPECT Score (0-10)</label>
-                        <select class="form-select" id="aspect" name="aspect">
-                            <option value="" disabled <?= sel('aspect_score', '') ?>>-- Select Score --</option>
-                            <?php for($i=0; $i<=10; $i++) echo "<option value='$i' ".sel('aspect_score', $i).">$i</option>"; ?>
-                        </select>
+    <div class="section-title" style="margin-top:0;">
+        <i class="bi bi-file-earmark-medical-fill text-primary"></i> 3. ผลการตรวจ CT/CTA (Imaging Results)
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <label for="aspect" class="form-label text-secondary">
+                <i class="bi bi-bar-chart-steps me-1"></i> ASPECT Score (0-10)
+            </label>
+            <select class="form-select text-center fw-bold text-primary" id="aspect" name="aspect">
+                <option value="" disabled <?= sel('aspect_score', '') ?>>-- Select --</option>
+                <?php for($i=0; $i<=10; $i++) echo "<option value='$i' ".sel('aspect_score', $i).">$i</option>"; ?>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="collateral" class="form-label text-secondary">
+                <i class="bi bi-diagram-3 me-1"></i> Collateral Score (0-5)
+            </label>
+            <select class="form-select text-center fw-bold text-primary" id="collateral" name="collateral">
+                <option value="" disabled <?= sel('collateral_score', '') ?>>-- Select --</option>
+                <?php for($i=0; $i<=5; $i++) echo "<option value='$i' ".sel('collateral_score', $i).">$i</option>"; ?>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="occlusionLocation" class="form-label text-secondary">
+                <i class="bi bi-geo-alt me-1"></i> Occlusion Site
+            </label>
+            <select class="form-select fw-bold" id="occlusionLocation" name="occlusionLocation">
+                <option value="" <?= sel('occlusion_site', '') ?>>-- เลือกตำแหน่ง --</option>
+                <option value="Left ICA" <?= sel('occlusion_site', 'Left ICA') ?>>Cervical ICA left</option>
+                <option value="Right ICA" <?= sel('occlusion_site', 'Right ICA') ?>>Cervical ICA Right</option>
+                <option value="Intracranial left ICA" <?= sel('occlusion_site', 'Intracranial left ICA') ?>>Intracranial ICA left</option>
+                <option value="Intracranial Right ICA" <?= sel('occlusion_site', 'Intracranial Right ICA') ?>>Intracranial ICA Right</option>
+                <option value="Left M1 of MCA" <?= sel('occlusion_site', 'Left M1 of MCA') ?>>Left M1 of MCA</option>
+                <option value="Right M1 of MCA" <?= sel('occlusion_site', 'Right M1 of MCA') ?>>Right M1 of MCA</option>
+                <option value="Left M2 of MCA" <?= sel('occlusion_site', 'Left M2 of MCA') ?>>Left M2 of MCA</option>
+                <option value="Right M2 of MCA" <?= sel('occlusion_site', 'Right M2 of MCA') ?>>Right M2 of MCA</option>
+                <option value="Left Beyond M2 of MCA" <?= sel('occlusion_site', 'Left Beyond M2 of MCA') ?>>Left Beyond M2 of MCA</option>
+                <option value="Right Beyond M2 of MCA" <?= sel('occlusion_site', 'Right Beyond M2 of MCA') ?>>Right Beyond M2 of MCA</option>
+                <option value="Left ACA" <?= sel('occlusion_site', 'Left ACA') ?>>Left ACA</option>
+                <option value="Right ACA" <?= sel('occlusion_site', 'Right ACA') ?>>Right ACA</option>
+                <option value="Left PCA" <?= sel('occlusion_site', 'Left PCA') ?>>Left PCA</option>
+                <option value="Right PCA" <?= sel('occlusion_site', 'Right PCA') ?>>Right PCA</option>
+                <option value="left Vertebral artery" <?= sel('occlusion_site', 'left Vertebral artery') ?>>left Vertebral artery</option>
+                <option value="Right Vertebral artery" <?= sel('occlusion_site', 'Right Vertebral artery') ?>>Right Vertebral artery</option>
+                <option value="Basilar" <?= sel('occlusion_site', 'Basilar') ?>>Basilar</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="p-4 rounded-4" style="background-color: #f8fbff; border: 2px dashed #e2e8f0;">
+        <label class="form-label fw-bold mb-4 text-center w-100 text-muted text-uppercase">
+            <i class="bi bi-clipboard-pulse me-2"></i> สรุปผล CT (Final Diagnosis)
+        </label>
+        
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-5">
+                <input class="btn-check" type="radio" name="ctResult" id="ctResultIschemic" value="ischemic" <?= chk('ct_result', 'ischemic') ?>>
+                <label class="diagnosis-option ischemic" for="ctResultIschemic">
+                    <i class="bi bi-droplet-half"></i>
+                    <div>
+                        <div class="diagnosis-label">Ischemic Stroke</div>
+                        <div class="diagnosis-sub">สมองขาดเลือด (อุดตัน)</div>
                     </div>
-                    <div class="col-md-4">
-                        <label for="collateral" class="form-label fw-bold">Collateral Score (0-5)</label>
-                        <select class="form-select" id="collateral" name="collateral">
-                            <option value="" disabled <?= sel('collateral_score', '') ?>>-- Select Score --</option>
-                            <?php for($i=0; $i<=5; $i++) echo "<option value='$i' ".sel('collateral_score', $i).">$i</option>"; ?>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label for="occlusionLocation" class="form-label fw-bold">Occlusion Site</label>
-                        <select class="form-select" id="occlusionLocation" name="occlusionLocation">
-                            <option value="" <?= sel('occlusion_site', '') ?>>-- เลือกตำแหน่ง --</option>
-                            <option value="Left ICA" <?= sel('occlusion_site', 'Left ICA') ?>>Cervical ICA left</option>
-                            <option value="Right ICA" <?= sel('occlusion_site', 'Right ICA') ?>>Cervical ICA Right</option>
-                            <option value="Intracranial left ICA" <?= sel('occlusion_site', 'Intracranial left ICA') ?>>Intracranial ICA left</option>
-                            <option value="Intracranial Right ICA" <?= sel('occlusion_site', 'Intracranial Right ICA') ?>>Intracranial ICA Right</option>
-                            <option value="Left M1 of MCA" <?= sel('occlusion_site', 'Left M1 of MCA') ?>>Left M1 of MCA</option>
-                            <option value="Right M1 of MCA" <?= sel('occlusion_site', 'Right M1 of MCA') ?>>Right M1 of MCA</option>
-                            <option value="Left M2 of MCA" <?= sel('occlusion_site', 'Left M2 of MCA') ?>>Left M2 of MCA</option>
-                            <option value="Right M2 of MCA" <?= sel('occlusion_site', 'Right M2 of MCA') ?>>Right M2 of MCA</option>
-                            <option value="Left Beyond M2 of MCA" <?= sel('occlusion_site', 'Left Beyond M2 of MCA') ?>>Left Beyond M2 of MCA</option>
-                            <option value="Right Beyond M2 of MCA" <?= sel('occlusion_site', 'Right Beyond M2 of MCA') ?>>Right Beyond M2 of MCA</option>
-                            <option value="Left ACA" <?= sel('occlusion_site', 'Left ACA') ?>>Left ACA</option>
-                            <option value="Right ACA" <?= sel('occlusion_site', 'Right ACA') ?>>Right ACA</option>
-                            <option value="Left PCA" <?= sel('occlusion_site', 'Left PCA') ?>>Left PCA</option>
-                            <option value="Right PCA" <?= sel('occlusion_site', 'Right PCA') ?>>Right PCA</option>
-                            <option value="left Vertebral artery" <?= sel('occlusion_site', 'left Vertebral artery') ?>>left Vertebral artery</option>
-                            <option value="Right Vertebral artery" <?= sel('occlusion_site', 'Right Vertebral artery') ?>>Right Vertebral artery</option>
-                            <option value="Basilar" <?= sel('occlusion_site', 'Basilar') ?>>Basilar</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="p-4 bg-light rounded border">
-                    <label class="form-label fw-bold mb-3 d-block"><i class="bi bi-diagram-3"></i> สรุปผล CT (Diagnosis Type):</label>
-                    <div class="d-flex gap-4">
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="ctResult" id="ctResultIschemic" value="ischemic" <?= chk('ct_result', 'ischemic') ?>>
-                            <label class="form-check-label fs-5 fw-bold text-primary" for="ctResultIschemic">
-                                Ischemic Stroke
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="ctResult" id="ctResultHemorrhagic" value="hemorrhagic" <?= chk('ct_result', 'hemorrhagic') ?>>
-                            <label class="form-check-label fs-5 fw-bold text-danger" for="ctResultHemorrhagic">
-                                Hemorrhagic Stroke
-                            </label>
-                        </div>
-                    </div>
-                </div>
+                </label>
             </div>
+
+            <div class="col-md-5">
+                <input class="btn-check" type="radio" name="ctResult" id="ctResultHemorrhagic" value="hemorrhagic" <?= chk('ct_result', 'hemorrhagic') ?>>
+                <label class="diagnosis-option hemorrhagic" for="ctResultHemorrhagic">
+                    <i class="bi bi-bandaid-fill"></i>
+                    <div>
+                        <div class="diagnosis-label">Hemorrhagic Stroke</div>
+                        <div class="diagnosis-sub">เลือดออกในสมอง (แตก)</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
 
             <div class="section-title mt-4">
                 <i class="bi bi-signpost-split"></i> การรักษา (Treatment Pathway)
             </div>
 
-            <div id="ischemicPathway" class="card-form <?= (isset($row['ct_result']) && $row['ct_result'] == 'ischemic') ? '' : 'd-none' ?>" style="border-top: 5px solid var(--primary-color);">
-                <div class="section-title text-primary" style="margin-top:0;">
-                    <i class="bi bi-activity"></i> A. แนวทาง Ischemic Stroke
-                </div>
-                
-                <div class="mb-4 p-3 bg-white border rounded shadow-sm">
-                    <label class="form-label fw-bold mb-2">1. ยาละลายลิ่มเลือด (Fibrinolytic)</label>
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-12">
-                            <div class="btn-group w-100 mb-3" role="group">
-                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_rtpa" value="rtpa" <?= chk('fibrinolytic_type', 'rtpa') ?>>
-                                <label class="btn btn-outline-primary" for="fib_rtpa">rt-PA</label>
+            <div id="ischemicPathway" class="card-form <?= (isset($row['ct_result']) && $row['ct_result'] == 'ischemic') ? '' : 'd-none' ?>" 
+     style="border-top: 5px solid #A0C4FF;">
+    
+    <div class="section-title text-primary" style="margin-top:0;">
+        <i class="bi bi-activity"></i> A. แนวทาง Ischemic Stroke
+    </div>
 
-                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_sk" value="sk" <?= chk('fibrinolytic_type', 'sk') ?>>
-                                <label class="btn btn-outline-primary" for="fib_sk">SK</label>
+    <div class="mb-4">
+        <label class="form-label fw-bold mb-3 text-secondary">
+            <i class="bi bi-capsule-pill me-2"></i> 1. ยาละลายลิ่มเลือด (Fibrinolytic)
+        </label>
+        
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_rtpa" value="rtpa" <?= chk('fibrinolytic_type', 'rtpa') ?>>
+            <label class="selection-chip chip-med-active" for="fib_rtpa">
+                <i class="bi bi-droplet-fill"></i> rt-PA
+            </label>
 
-                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_tnk" value="tnk" <?= chk('fibrinolytic_type', 'tnk') ?>>
-                                <label class="btn btn-outline-primary" for="fib_tnk">TNK</label>
+            
 
-                                <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_no" value="no" <?= chk('fibrinolytic_type', 'no') ?>>
-                                <label class="btn btn-outline-secondary" for="fib_no">NO (ไม่ให้ยา)</label>
-                            </div>
-                        </div>
+            <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_tnk" value="tnk" <?= chk('fibrinolytic_type', 'tnk') ?>>
+            <label class="selection-chip chip-med-active" for="fib_tnk">
+                <i class="bi bi-virus"></i> TNK
+            </label>
+
+            <input type="radio" class="btn-check" name="fibrinolytic_type" id="fib_no" value="no" <?= chk('fibrinolytic_type', 'no') ?>>
+            <label class="selection-chip chip-med-no" for="fib_no">
+                <i class="bi bi-x-circle-fill"></i> NO (ไม่ให้ยา)
+            </label>
+        </div>
+
+        <div class="row g-3 align-items-stretch">
+            <div class="col-md-8">
+                <div class="input-box-card h-100 py-3">
+                    <label class="form-label text-muted small fw-bold mb-2">เวลาเริ่มยา (Start Time)</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0 rounded-start-4">
+                            <i class="bi bi-calendar2-check text-success"></i>
+                        </span>
+                        <input type="date" class="form-control border-start-0" id="tpaDate" name="tpaDate" value="<?= dt('tpa_datetime', 'd') ?>">
                         
-                        <div class="col-md-5">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light">เริ่มยา (Start)</span>
-                                <input type="date" class="form-control" id="tpaDate" name="tpaDate" value="<?= dt('tpa_datetime', 'd') ?>">
-                                <input type="text" class="form-control timepicker" placeholder="เวลา" id="tpaTime" name="tpaTime" value="<?= dt('tpa_datetime', 't') ?>">
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <span class="input-group-text bg-success bg-opacity-25 fw-bold text-success">Door to Needle</span>
-                                <input type="text" class="form-control fw-bold text-success bg-success bg-opacity-10" id="calc_door_to_needle" name="time_door_to_needle_min" readonly placeholder="นาที" value="<?= val('time_door_to_needle_min') ?>">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-3 bg-white border rounded shadow-sm">
-                    <label class="form-label fw-bold mb-2">2. การเตรียมทำหัตถการ (Preparation)</label>
-                    <div class="row g-3">
-                        <div class="col-md-4 border-end">
-                            <label for="anesthesiaTime" class="form-label text-muted small">Set ดมยา (Anesthesia Set)</label>
-                            <div class="input-group input-group-sm">
-                                <input type="date" class="form-control" id="anesthesiaTime" name="anesthesiaTime_date" value="<?= dt('anesthesia_set_datetime', 'd') ?>">
-                                <input type="text" class="form-control timepicker" placeholder="คลิกเพื่อเลือกใส่เวลา" name="anesthesiaTime_time" value="<?= dt('anesthesia_set_datetime', 't') ?>">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="punctureTime" class="form-label text-muted small">Activate Team</label>
-                            <div class="input-group input-group-sm">
-                                <input type="date" class="form-control" id="punctureTime" name="punctureTime_date" value="<?= dt('activate_team_datetime', 'd') ?>">
-                                <input type="text" class="form-control timepicker" placeholder="คลิกเพื่อเลือกใส่เวลา" name="punctureTime_time" value="<?= dt('activate_team_datetime', 't') ?>" placeholder="คลิกเพื่อเลือกใส่เงลา">
-                            </div>
-                        </div>
+                        <span class="input-group-text bg-white border-start-0 border-end-0">
+                            <i class="bi bi-clock text-success"></i>
+                        </span>
+                        <input type="text" class="form-control timepicker border-start-0 rounded-end-4 text-center fw-bold" placeholder="เวลา" id="tpaTime" name="tpaTime" value="<?= dt('tpa_datetime', 't') ?>">
                     </div>
                 </div>
             </div>
 
-            <div id="hemorrhagicPathway" class="card-form <?= (isset($row['ct_result']) && $row['ct_result'] == 'hemorrhagic') ? '' : 'd-none' ?>" style="border-top: 5px solid var(--accent-color);">
-                <div class="section-title text-danger" style="margin-top:0;">
-                    <i class="bi bi-bandaid"></i> B. แนวทาง Hemorrhagic Stroke
+            <div class="col-md-4">
+                <div class="calc-result-box" style="background: #f0fdf4; border-color: #bbf7d0;">
+                    <label class="text-success fw-bold">Door to Needle (นาที)</label>
+                    <input type="text" class="text-success" id="calc_door_to_needle" name="time_door_to_needle_min" readonly placeholder="..." value="<?= val('time_door_to_needle_min') ?>">
                 </div>
-                <div class="p-4 bg-danger bg-opacity-10 rounded border border-danger">
-                    <label class="form-label fw-bold text-danger fs-5 mb-2">
-                        <i class="bi bi-telephone-forward me-2"></i> ปรึกษาศัลยแพทย์ระบบประสาท (Consult Neurosurgeon)
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <label class="form-label fw-bold mb-3 text-secondary">
+            <i class="bi bi-clipboard-check me-2"></i> 2. การเตรียมทำหัตถการ (Preparation)
+        </label>
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="input-box-card h-100">
+                    <label class="form-label fw-bold text-muted mb-2">
+                        <i class="bi bi-lungs me-1 text-info"></i> Set ดมยา (Anesthesia Set)
                     </label>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small">วันที่ปรึกษา</label>
-                            <input type="date" class="form-control" name="consultNS_date" value="<?= dt('consult_neurosurgeon_datetime', 'd') ?>">
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label text-muted small">เวลา</label>
-                            <input type="text" class="form-control timepicker" name="consultNS_time" value="<?= dt('consult_neurosurgeon_datetime', 't') ?>" placeholder="--:--">
-                        </div>
+                    <div class="input-group input-group-sm">
+                        <input type="date" class="form-control" id="anesthesiaTime" name="anesthesiaTime_date" value="<?= dt('anesthesia_set_datetime', 'd') ?>">
+                        <input type="text" class="form-control timepicker text-center" placeholder="เวลา" name="anesthesiaTime_time" value="<?= dt('anesthesia_set_datetime', 't') ?>">
                     </div>
                 </div>
             </div>
+
+            <div class="col-md-6">
+                <div class="input-box-card h-100">
+                    <label class="form-label fw-bold text-muted mb-2">
+                        <i class="bi bi-people-fill me-1 text-warning"></i> Activate Team
+                    </label>
+                    <div class="input-group input-group-sm">
+                        <input type="date" class="form-control" id="punctureTime" name="punctureTime_date" value="<?= dt('activate_team_datetime', 'd') ?>">
+                        <input type="text" class="form-control timepicker text-center" placeholder="เวลา" name="punctureTime_time" value="<?= dt('activate_team_datetime', 't') ?>">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <div id="hemorrhagicPathway" class="card-form <?= (isset($row['ct_result']) && $row['ct_result'] == 'hemorrhagic') ? '' : 'd-none' ?>" 
+     style="border-top: 5px solid #FFB7B2;">
+    
+    <div class="section-title text-danger" style="margin-top:0;">
+        <i class="bi bi-bandaid-fill"></i> B. แนวทาง Hemorrhagic Stroke
+    </div>
+    
+    <div class="input-box-card danger p-4">
+        <label class="form-label fw-bold text-danger fs-5 mb-3 d-flex align-items-center">
+            <span class="icon-container bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; font-size: 1.5rem;">
+                <i class="bi bi-telephone-forward-fill"></i>
+            </span>
+            ปรึกษาศัลยแพทย์ระบบประสาท (Consult Neurosurgeon)
+        </label>
+        
+        <div class="row align-items-center">
+            <div class="col-md-7">
+                <label class="form-label text-muted small fw-bold">ระบุเวลาที่ปรึกษา (Consult Time)</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-4 ps-3 border-danger border-opacity-25">
+                        <i class="bi bi-calendar-event text-danger"></i>
+                    </span>
+                    <input type="date" class="form-control border-start-0 border-end-0 border-danger border-opacity-25 text-danger fw-bold" 
+                           name="consultNS_date" value="<?= dt('consult_neurosurgeon_datetime', 'd') ?>">
+                    
+                    <span class="input-group-text bg-white border-start-0 border-end-0 border-danger border-opacity-25">
+                        <i class="bi bi-clock text-danger"></i>
+                    </span>
+                    <input type="text" class="form-control timepicker border-start-0 rounded-end-4 text-center fw-bold text-danger border-danger border-opacity-25" 
+                           name="consultNS_time" value="<?= dt('consult_neurosurgeon_datetime', 't') ?>" placeholder="--:--">
+                </div>
+            </div>
+            
+            <div class="col-md-5">
+                <div class="alert alert-danger bg-danger bg-opacity-10 border-0 rounded-4 d-flex align-items-center m-0">
+                    <i class="bi bi-exclamation-circle-fill fs-4 me-3"></i>
+                    <small class="lh-sm">
+                        <strong>Note:</strong> กรณี Hemorrhagic Stroke ให้รีบปรึกษา Neurosurgeon ทันทีเพื่อพิจารณาการผ่าตัด
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
             <div class="text-center mt-5 mb-5">
                 <button type="button" class="btn btn-primary btn-lg px-5 py-3 shadow" id="saveErBtn" style="border-radius: 50px;">

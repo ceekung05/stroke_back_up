@@ -164,3 +164,862 @@ body {
     .main { margin: 0 !important; width: 100% !important; }
     .card-form, .chart-box { background: white !important; border: 1px solid #ccc !important; box-shadow: none !important; }
 }
+
+/*  */
+/* --- Custom Radio Box (กล่องเลือกสิทธิการรักษา) --- */
+.treatment-option {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 20px; /* มุมโค้งมน */
+    padding: 15px 10px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 120px;
+    flex: 1; /* ขยายเต็มพื้นที่ */
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* ระยะห่างไอคอนกับตัวหนังสือ */
+}
+
+/* Hover: ชี้แล้วลอยขึ้นนิดนึง */
+.treatment-option:hover {
+    border-color: #A0C4FF; /* สีฟ้าพาสเทล */
+    background: #f8fbff;
+    transform: translateY(-3px);
+}
+
+/* Checked: เลือกแล้วเปลี่ยนสีไล่เฉด */
+.btn-check:checked + .treatment-option {
+    background-image: var(--gradient-primary); /* ใช้สีธีมหลัก */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(168, 237, 234, 0.4); /* เงาฟุ้งๆ */
+    transform: translateY(-5px);
+}
+
+/* ปรับสีไอคอน */
+.treatment-option i {
+    font-size: 1.8rem;
+    color: #BDB2FF; /* สีม่วงพาสเทล */
+    transition: color 0.3s;
+}
+
+/* เลือกแล้วไอคอนเป็นสีขาว */
+.btn-check:checked + .treatment-option i {
+    color: white;
+}
+
+/* --- Arrival Option Cards (กล่องเลือกช่องทางการมา) --- */
+.arrival-option {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 20px;
+    padding: 15px 20px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 140px;
+    flex: 1;
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover: ลอยขึ้น */
+.arrival-option:hover {
+    border-color: #FFB7B2; /* สีชมพูพาสเทล */
+    background: #fff5f5;
+    transform: translateY(-3px);
+}
+
+/* Checked: เปลี่ยนสีไล่เฉด */
+.btn-check:checked + .arrival-option {
+    background-image: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 10px 20px rgba(168, 237, 234, 0.4);
+    transform: translateY(-5px);
+}
+
+/* ปรับไอคอน */
+.arrival-option i {
+    font-size: 2rem;
+    color: #FF9AA2; /* สีแดงอมชมพู */
+    transition: color 0.3s;
+}
+
+/* เลือกแล้วไอคอนขาว */
+.btn-check:checked + .arrival-option i { color: white; }
+
+/* --- Fast Track Toggle Cards (กล่องเลือก YES/NO) --- */
+.fast-track-option {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 50px; /* ทรงแคปซูลมนๆ */
+    padding: 12px 30px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 140px;
+    color: var(--text-dark);
+    font-weight: 800; /* ตัวหนาพิเศษ */
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Hover Effect: ลอยขึ้นเล็กน้อย */
+.fast-track-option:hover { transform: translateY(-3px); }
+
+/* --- สไตล์ปุ่ม YES (สีแดง/ชมพูพาสเทล) --- */
+.option-yes:hover { border-color: #ff9a9e; background-color: #fff5f5; color: #ff9a9e; }
+
+.btn-check:checked + .option-yes {
+    background-image: var(--gradient-danger); /* สีธีม Danger (ชมพู-พีช) */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(255, 154, 158, 0.4); /* เงาสีแดงจางๆ */
+}
+
+/* --- สไตล์ปุ่ม NO (สีเทาพาสเทล) --- */
+.option-no:hover { border-color: #a0aec0; background-color: #f7fafc; color: #718096; }
+
+.btn-check:checked + .option-no {
+    background: linear-gradient(135deg, #e2ebf0 0%, #cfd9df 100%); /* เทาเงิน */
+    color: #4a5568;
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Symptom Selection Cards (กล่องเลือกอาการ) --- */
+.symptom-card {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 15px 10px;
+    text-align: center;
+    transition: all 0.3s ease;
+    min-width: 90px;
+    flex: 1; /* ขยายเต็มพื้นที่ */
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover: ลอยขึ้นนิดนึง */
+.symptom-card:hover {
+    border-color: #FFB7B2; /* ชมพูพาสเทล */
+    background: #fff5f5;
+    transform: translateY(-3px);
+}
+
+/* Checked: เปลี่ยนสีไล่เฉด */
+.btn-check:checked + .symptom-card {
+    background-image: var(--gradient-danger); /* ใช้โทนสีแดง/ชมพู สื่อถึงอาการ */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 15px rgba(255, 154, 158, 0.3);
+}
+
+/* ปรับไอคอน */
+.symptom-card i {
+    font-size: 1.6rem;
+    color: #FF9AA2;
+    transition: color 0.3s;
+}
+
+/* เลือกแล้วไอคอนขาว */
+.btn-check:checked + .symptom-card i { color: white; }
+
+/* --- GCS Score Buttons (ปุ่มคะแนนแบบกลม) --- */
+.btn-gcs {
+    width: 40px; height: 40px;
+    border-radius: 50%; /* ทรงกลม */
+    border: 1px solid var(--border-color);
+    background: #ffffff;
+    color: var(--text-muted);
+    font-weight: 700;
+    padding: 0;
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-right: 4px;
+    font-size: 1rem;
+}
+
+/* Hover: ลอยขึ้น + สีขอบเปลี่ยน */
+.btn-gcs:hover {
+    background-color: #f0f9ff;
+    border-color: #A0C4FF;
+    color: #66a6ff;
+    transform: translateY(-2px);
+}
+
+/* Checked: เปลี่ยนสีเป็นไล่เฉด */
+.btn-check:checked + .btn-gcs {
+    background-image: var(--gradient-primary); /* สีธีม Cotton Candy */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(160, 196, 255, 0.5); /* เงาสีฟ้าฟุ้งๆ */
+    transform: scale(1.1); /* ขยายใหญ่ขึ้นนิดนึงตอนเลือก */
+}
+
+/* --- NIHSS Input (ช่องกรอกคะแนนใหญ่ๆ) --- */
+.input-nihss {
+    height: 100px;
+    font-size: 3rem;
+    font-weight: 800;
+    color: #A0C4FF; /* สีตัวเลข */
+    border: 2px solid var(--border-color);
+    background: #fdfdfd;
+    border-radius: 24px;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.03); /* เงาบุ๋มลงไป */
+    transition: all 0.3s;
+}
+
+.input-nihss:focus {
+    border-color: #ff9a9e; /* โฟกัสแล้วขอบสีชมพู */
+    box-shadow: 0 0 0 5px rgba(255, 154, 158, 0.2);
+    background: #fff;
+    color: #ff9a9e;
+}
+
+/* ป้ายกำกับคะแนน GCS (E, V, M) */
+.gcs-label {
+    width: 30px;
+    height: 30px;
+    background: #e2e8f0;
+    color: #64748b;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 0.9rem;
+}
+
+/* --- Styled Input Box (กล่องกรอกข้อมูลแบบสวย) --- */
+.input-box-card {
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 20px; /* โค้งมน */
+    padding: 20px;
+    transition: all 0.3s ease;
+    height: 45%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover: ขอบเปลี่ยนสี + เงาฟุ้ง */
+.input-box-card:hover {
+    border-color: #BDB2FF; /* ม่วงพาสเทล */
+    box-shadow: 0 10px 25px rgba(189, 178, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Focus Within: เมื่อกำลังพิมพ์ ให้กล่องเด่นขึ้น */
+.input-box-card:focus-within {
+    border-color: #A0C4FF; /* ฟ้าพาสเทล */
+    background: #fdfaff;
+    box-shadow: 0 0 0 4px rgba(160, 196, 255, 0.2);
+}
+
+/* ปรับแต่ง Input Group ให้นวลตา */
+.input-group-text {
+    background-color: #f8faff;
+    border-color: var(--border-color);
+    color: #8892b0;
+}
+.input-group:focus-within .input-group-text {
+    border-color: #A0C4FF;
+    background-color: #e6f7ff;
+    color: #66a6ff;
+}
+
+/* --- Selection Chips (ปุ่มเลือกแบบแคปซูล) --- */
+.selection-chip {
+    cursor: pointer;
+    background: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 50px; /* ทรงแคปซูล */
+    padding: 8px 20px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-dark);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    min-width: 80px;
+    justify-content: center;
+}
+
+/* Hover: ลอยขึ้นนิดนึง */
+.selection-chip:hover {
+    border-color: #A0C4FF;
+    background: #f8fbff;
+    transform: translateY(-2px);
+}
+
+/* Checked: โรคประจำตัว (ใช้ธีมหลัก ฟ้า-ชมพู) */
+.btn-check:checked + .chip-disease {
+    background-image: var(--gradient-primary);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(160, 196, 255, 0.4);
+}
+
+/* Checked: สารเสพติด (ใช้ธีมรอง ส้ม-แดง) */
+.btn-check:checked + .chip-addict {
+    background-image: var(--gradient-danger);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(255, 154, 158, 0.4);
+}
+
+/* ไอคอนในปุ่ม */
+.selection-chip i { font-size: 1.1rem; opacity: 0.7; transition: opacity 0.2s; }
+.btn-check:checked + .selection-chip i { opacity: 1; color: white; }
+
+/* --- Medication Group Card (กล่องกลุ่มยา) --- */
+.med-group-card {
+    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Header ของกลุ่มยา (Anti-platelet / Anti-coagulant) */
+.med-group-header {
+    background: #f1f5f9;
+    padding: 10px 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+/* เมื่อ Check หัวข้อใหญ่ */
+.med-check-main:checked + .med-group-header {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 10px rgba(160, 196, 255, 0.4);
+}
+
+/* รายการย่อย (Nested Items) */
+.med-sub-item {
+    margin-left: 10px;
+    padding: 8px 12px;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+.med-sub-item:hover { background-color: #f8fafc; }
+
+/* --- MRS Score Selector (เลือกคะแนน) --- */
+.mrs-option {
+    width: 45px; height: 45px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 1.2rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.mrs-option:hover { transform: translateY(-3px); border-color: #A0C4FF; }
+
+/* Checked: เปลี่ยนสีตามระดับความรุนแรง */
+.btn-check:checked + .mrs-option {
+    color: white; border-color: transparent; transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* สีคะแนน (ไล่ระดับ เขียว -> แดง) */
+.mrs-0:checked + .mrs-option { background: #4ade80; } /* 0 = ปกติ */
+.mrs-1:checked + .mrs-option { background: #84cc16; }
+.mrs-2:checked + .mrs-option { background: #facc15; }
+.mrs-3:checked + .mrs-option { background: #fbbf24; }
+.mrs-4:checked + .mrs-option { background: #fb923c; }
+.mrs-5:checked + .mrs-option { background: #f87171; }
+.mrs-6:checked + .mrs-option { background: #ef4444; } /* 6 = เสียชีวิต */
+
+/* --- Input Box Variant: Danger (สำหรับ Onset Time) --- */
+.input-box-card.danger {
+    border-color: #FFB7B2; /* ขอบสีชมพูพาสเทล */
+}
+
+/* Hover: เงานุ่มๆ สีแดง */
+.input-box-card.danger:hover {
+    box-shadow: 0 10px 25px rgba(255, 183, 178, 0.3);
+    background: #fffafa; /* พื้นหลังอมชมพูจางๆ */
+    transform: translateY(-2px);
+}
+
+/* Focus: เมื่อกรอกข้อมูล ให้กล่องเด่นขึ้น */
+.input-box-card.danger:focus-within {
+    border-color: #FF9AA2;
+    background: #fff5f7;
+    box-shadow: 0 0 0 4px rgba(255, 154, 162, 0.2);
+}
+
+/* ปรับสีหัวข้อ */
+.input-box-card.danger label {
+    color: #ff758c; 
+}
+
+/* ปรับสี Input Group ด้านใน */
+.input-box-card.danger .input-group-text {
+    background-color: #fff0f3;
+    color: #ff758c;
+    border-color: #FFB7B2;
+}
+.input-box-card.danger .form-control {
+    border-color: #FFB7B2;
+}
+.input-box-card.danger .form-control:focus {
+    border-color: #ff758c;
+    box-shadow: none; 
+}
+
+/* --- Timeline Cards & Calculator --- */
+
+/* กล่องแสดงผลลัพธ์คำนวณ (Door to ...) */
+.calc-result-box {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1; /* ขอบเส้นประดู Technical */
+    border-radius: 16px;
+    padding: 10px;
+    text-align: center;
+    height: 45%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+/* เมื่อมีตัวเลข (Value ไม่ว่าง) ให้เปลี่ยนสี */
+.calc-result-box input:not([value=""]) {
+    color: var(--primary-color);
+}
+
+.calc-result-box label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.calc-result-box input {
+    background: transparent;
+    border: none;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #475569;
+    width: 100%;
+    padding: 0;
+}
+
+/* Alert Box สำหรับ Hospital Arrival */
+.arrival-alert-card {
+    background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); /* ฟ้าจางๆ */
+    border: 1px solid #bae6fd;
+    border-radius: 16px;
+    padding: 15px 20px;
+    color: #0369a1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+}
+.arrival-alert-card i { font-size: 1.5rem; color: #0ea5e9; }
+
+/* --- Diagnosis Cards (กล่องเลือกผลวินิจฉัย) --- */
+.diagnosis-option {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 24px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hover Effect */
+.diagnosis-option:hover { transform: translateY(-5px); box-shadow: var(--shadow-soft); }
+
+/* --- Ischemic Style (Blue Theme) --- */
+.diagnosis-option.ischemic:hover { border-color: #A0C4FF; background-color: #f0f9ff; }
+.diagnosis-option.ischemic i { color: #A0C4FF; font-size: 3rem; transition: all 0.3s; }
+
+.btn-check:checked + .diagnosis-option.ischemic {
+    background-image: var(--gradient-primary); /* ฟ้า-ม่วง */
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 10px 25px rgba(160, 196, 255, 0.5);
+}
+.btn-check:checked + .diagnosis-option.ischemic i { color: white; transform: scale(1.1); }
+
+/* --- Hemorrhagic Style (Red Theme) --- */
+.diagnosis-option.hemorrhagic:hover { border-color: #FFB7B2; background-color: #fff5f5; }
+.diagnosis-option.hemorrhagic i { color: #FFB7B2; font-size: 3rem; transition: all 0.3s; }
+
+.btn-check:checked + .diagnosis-option.hemorrhagic {
+    background-image: var(--gradient-danger); /* ชมพู-แดง */
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 10px 25px rgba(255, 154, 158, 0.5);
+}
+.btn-check:checked + .diagnosis-option.hemorrhagic i { color: white; transform: scale(1.1); }
+
+/* ปรับแต่ง Label ในการ์ด */
+.diagnosis-label { font-size: 1.2rem; font-weight: 800; letter-spacing: 0.5px; }
+.diagnosis-sub { font-size: 0.85rem; opacity: 0.8; font-weight: normal; }
+
+/* --- Medicine Chips (ปุ่มเลือกยา) --- */
+/* สำหรับยากลุ่ม rt-PA, SK, TNK (สีฟ้า/น้ำเงิน) */
+.btn-check:checked + .chip-med-active {
+    background-image: var(--gradient-primary); /* ฟ้า-ม่วง */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* สำหรับเลือก NO (สีเทา) */
+.btn-check:checked + .chip-med-no {
+    background: #e2e8f0;
+    color: #475569;
+    border-color: #cbd5e0;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+.col-md-4{
+  height: 50%;
+
+}
+
+/* --- Time Info Pills (แคปซูลแสดงเวลาด้านบน) --- */
+.time-info-container {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 10px;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    border: 1px dashed #cbd5e1;
+}
+
+.time-pill {
+    background: white;
+    padding: 8px 20px;
+    border-radius: 50px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    border: 1px solid var(--border-color);
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.time-pill i { font-size: 1.1rem; }
+
+/* --- Procedure Cards (การ์ดเลือกหัตถการ) --- */
+.procedure-card {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 24px;
+    padding: 25px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.procedure-card:hover { transform: translateY(-5px); }
+
+/* --- MT Style (Blue Theme) --- */
+.procedure-card.mt:hover { border-color: #66a6ff; background-color: #f0f9ff; }
+.procedure-card.mt i { color: #66a6ff; font-size: 2.5rem; transition: all 0.3s; }
+
+.btn-check:checked + .procedure-card.mt {
+    background-image: var(--gradient-primary);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 10px 20px rgba(102, 166, 255, 0.4);
+}
+.btn-check:checked + .procedure-card.mt i { color: white; transform: scale(1.1); }
+
+/* --- Hemo Style (Red/Pink Theme) --- */
+.procedure-card.hemo:hover { border-color: #ff758c; background-color: #fff5f5; }
+.procedure-card.hemo i { color: #ff758c; font-size: 2.5rem; transition: all 0.3s; }
+
+.btn-check:checked + .procedure-card.hemo {
+    background-image: var(--gradient-danger);
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 10px 20px rgba(255, 117, 140, 0.4);
+}
+.btn-check:checked + .procedure-card.hemo i { color: white; transform: scale(1.1); }
+
+.proc-title { font-size: 1.1rem; font-weight: 800; }
+.proc-subtitle { font-size: 0.85rem; opacity: 0.8; }
+
+/* --- Hemorrhagic Procedure Chips (ปุ่มเลือกหัตถการผ่าตัด) --- */
+.btn-check:checked + .chip-hemo-active {
+    background-image: var(--gradient-danger); /* สีแดงไล่เฉด */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(255, 154, 158, 0.4);
+}
+
+/* --- Modern Table (ตารางสไตล์มินิมอล) --- */
+.table-modern {
+    margin-bottom: 0;
+}
+
+.table-modern thead th {
+    background-color: #f8fafc; /* พื้นหลังหัวตารางสีเทาจางๆ */
+    color: #64748b;
+    font-weight: 700;
+    border-bottom: 2px solid #e2e8f0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85rem;
+    padding: 15px;
+}
+
+.table-modern tbody td {
+    padding: 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+    color: var(--text-dark);
+    font-size: 0.95rem;
+}
+
+.table-modern tbody tr:last-child td {
+    border-bottom: none; /* ลบเส้นบรรทัดสุดท้าย */
+}
+
+.table-modern tbody tr:hover {
+    background-color: #f0f9ff; /* สีฟ้าจางๆ เมื่อเอาเมาส์ชี้ */
+}
+
+/* --- Soft Badges (ป้ายตัวเลขสีพาสเทล) --- */
+.badge-soft {
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-block;
+}
+
+.badge-soft-primary {
+    background-color: #e0f2fe; /* ฟ้าอ่อน */
+    color: #0369a1;
+    border: 1px solid #bae6fd;
+}
+
+.badge-soft-warning {
+    background-color: #fef3c7; /* เหลืองอ่อน */
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+/* --- Toggle Status Buttons --- */
+.btn-toggle-status {
+    border: 1px solid var(--border-color);
+    background-color: #f8fafc;
+    color: var(--text-muted);
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-toggle-status:hover {
+    background-color: #f1f5f9;
+}
+
+/* สถานะ: มาตามนัด (สีเขียว) */
+.btn-check:checked + .btn-status-success {
+    background-color: #dcfce7 !important; /* เขียวพาสเทล */
+    color: #166534 !important; /* เขียวเข้ม */
+    border-color: #86efac !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* สถานะ: ไม่มา (สีแดง/เทา) */
+.btn-check:checked + .btn-status-danger {
+    background-color: #fee2e2 !important; /* แดงพาสเทล */
+    color: #991b1b !important; /* แดงเข้ม */
+    border-color: #fca5a5 !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* --- Custom Modal --- */
+.modal-content {
+    border-radius: 24px;
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #66a6ff 0%, #89f7fe 100%);
+    border-bottom: none;
+    padding: 20px 30px;
+}
+
+.modal-title {
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+}
+
+/* ปรับ Input ใน Modal ให้ดูดี */
+.modal-body .input-group-text {
+    background-color: #f8fafc;
+    border-color: var(--border-color);
+    color: #64748b;
+}
+
+.modal-body .form-control:focus {
+    background-color: #fff;
+    border-color: #66a6ff;
+    box-shadow: 0 0 0 4px rgba(102, 166, 255, 0.15);
+}
+
+/* --- Treatment Option Cards (ปุ่มเลือกสิทธิการรักษา) --- */
+.treatment-option {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 15px 20px;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 120px;
+    flex: 1; /* ขยายเต็มพื้นที่ */
+    color: var(--text-dark);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.treatment-option:hover {
+    transform: translateY(-3px);
+    border-color: #BDB2FF;
+    background-color: #fcfaff;
+}
+
+.treatment-option i { font-size: 1.5rem; color: #A0C4FF; transition: color 0.3s; }
+
+/* Active State (เมื่อเลือก) */
+.btn-check:checked + .treatment-option {
+    background-image: var(--gradient-primary); /* สีธีม Cotton Candy */
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 20px rgba(160, 196, 255, 0.4);
+}
+
+.btn-check:checked + .treatment-option i { color: white; }
+
+/* --- Base Selection Card Style --- */
+.selection-chip-card {
+    cursor: pointer;
+    background: #ffffff;
+    border: 2px solid #e2e8f0; /* สีขอบปกติ (สีเทา) */
+    border-radius: 16px;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.selection-chip-card:hover {
+    transform: translateY(-3px);
+    border-color: #cbd5e1;
+}
+
+/* --- Active States (เมื่อถูกเลือก) --- */
+
+/* สีเขียว (Success) */
+.btn-check:checked + .chip-success {
+    background-color: #f0fdf4 !important;
+    border-color: #22c55e !important; /* ขอบเขียว */
+    color: #15803d !important;
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* สีฟ้า (Primary) */
+.btn-check:checked + .chip-primary {
+    background-color: #eff6ff !important;
+    border-color: #3b82f6 !important; /* ขอบฟ้า */
+    color: #1d4ed8 !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* สีเหลือง/ส้ม (Warning) */
+.btn-check:checked + .chip-warning {
+    background-color: #fffbeb !important;
+    border-color: #f59e0b !important; /* ขอบส้ม */
+    color: #b45309 !important;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+}
+
+/* สีแดง (Danger) */
+.btn-check:checked + .chip-danger {
+    background-color: #fef2f2 !important;
+    border-color: #ef4444 !important; /* ขอบแดง */
+    color: #b91c1c !important;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+/* เพิ่มเครื่องหมายถูกมุมขวาบนเมื่อเลือก */
+.btn-check:checked + .selection-chip-card::after {
+    content: "\F26A"; /* Bootstrap Icon: check-circle-fill */
+    font-family: "bootstrap-icons";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
